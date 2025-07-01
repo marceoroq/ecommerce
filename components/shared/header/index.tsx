@@ -1,8 +1,11 @@
-import { APP_NAME } from "@/lib/constants";
 import Link from "next/link";
-import Logo from "../logo";
+import { ShoppingBag, User } from "lucide-react";
+
+import Logo from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ShoppingBasket, ShoppingCart, User } from "lucide-react";
+import { ModeToggle } from "@/components/shared/header/mode-toggle";
+
+import { APP_NAME } from "@/lib/constants";
 
 const Header = () => {
   return (
@@ -17,13 +20,14 @@ const Header = () => {
           </Link>
         </div>
         <div className="space-x-2">
+          <ModeToggle />
           <Button asChild variant="ghost">
             <Link href="/cart">
               <ShoppingBag /> Cart
             </Link>
           </Button>
-          <Button asChild variant="ghost">
-            <Link href="/cart">
+          <Button asChild>
+            <Link href="/signin">
               <User /> Sign In
             </Link>
           </Button>
