@@ -1,10 +1,14 @@
-import { Button } from "@/components/ui/button";
+import ProductList from "@/components/shared/product/product-list";
+import sampleData from "@/db/sample-data";
 
 export default function HomePage() {
   return (
     <div className="p-2 flex flex-col w-fit gap-2">
-      <h1 className="text-4xl font-semibold">Zephyr</h1>
-      <Button>Testing</Button>
+      <ProductList
+        data={sampleData.products}
+        title="Newest Arribals"
+        limit={4}
+      />
     </div>
   );
 }
