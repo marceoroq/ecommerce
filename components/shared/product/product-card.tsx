@@ -32,7 +32,7 @@ const ProductCard = ({ product }: { product: any }) => {
           {product.rating} ({product.numReviews} Reviews)
         </div>
         {hasStock ? (
-          <div className="font-medium">${product.price.toFixed(2)}</div>
+          <div className="font-medium">${Number(product.price).toFixed(2)}</div>
         ) : (
           <Badge variant="secondary" className="w-fit text-gray-500">
             Out of Stock
