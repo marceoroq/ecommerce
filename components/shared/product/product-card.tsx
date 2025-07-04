@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-const ProductCard = ({ product }: { product: any }) => {
+const ProductCard = ({ product }: { product: Product }) => {
   const hasStock = product.stock > 0;
 
   return (

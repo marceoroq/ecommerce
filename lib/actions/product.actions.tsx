@@ -1,12 +1,13 @@
 "use server";
 
+import { Product } from "@/types";
 import { getProducts } from "@/lib/services/product.services";
-import { toPlainObject } from "@/lib/utils";
+import { convertPrismaProductsToPOJO } from "@/lib/serializer/product.serializer";
 
-export async function getProductsAction() {
+export async function getProductsAction(): Promise<Product[]> {
   try {
     const products = await getProducts();
-    return toPlainObject(products);
+    return convertPrismaProductsToPOJO(products);
   } catch (error) {
     throw new Error(
       `Failed to fetch products: ${
