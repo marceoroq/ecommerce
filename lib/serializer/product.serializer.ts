@@ -14,7 +14,7 @@ export function convertPrismaProductToPOJO(prismaProduct: PrismaProduct): PlainP
   return {
     ...toPlainObject(prismaProduct),
     price: prismaProduct.price.toString(),
-    rating: prismaProduct.price.toNumber(),
+    rating: prismaProduct.rating.toNumber(),
   }
 } 
 

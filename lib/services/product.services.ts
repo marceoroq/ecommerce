@@ -35,16 +35,12 @@ export async function getProductById(id: string, options?: Prisma.ProductFindUni
  * @param options Prisma findUnique options (include, select, etc.)
  * @returns The Product record or null if not found.
  */
-// export async function getProductByUniqueField(fieldName: keyof PrismaModel, value: any, options?: Prisma.ProductFindUniqueArgs): Promise<PrismaModel | null> {
-  // Example for a 'slug' field:
-  // return await prisma.product.findUnique({
-  //   where: { [fieldName]: value },
-  //   ...options,
-  // });
-  // Note: For 'findUnique', Prisma requires the unique field to be explicitly typed in 'where'.
-  // You might need to refine this for specific unique fields (e.g., { where: { slug: value as string } })
-  // return null; // Placeholder, refine based on specific unique fields
-// }
+export async function getProductBySlug(value: string, options?: Prisma.ProductFindUniqueArgs): Promise<PrismaModel | null> {
+  return await prisma.product.findUnique({
+    where: { slug: value },
+    ...options,
+  });
+}
 
 // ===========================================================
 // WRITE OPERATIONS
