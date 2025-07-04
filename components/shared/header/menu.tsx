@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  EllipsisVertical,
-  PanelRightOpen,
-  ShoppingBag,
-  User,
-} from "lucide-react";
+import { PanelRightOpen, ShoppingBag, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "@/components/shared/header/mode-toggle";
