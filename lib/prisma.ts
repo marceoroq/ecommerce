@@ -1,27 +1,22 @@
-import { PrismaClient } from '../lib/generated/prisma'
-import { withAccelerate } from '@prisma/extension-accelerate'
-
-import { neonConfig, Pool, PoolConfig } from '@neondatabase/serverless'
+import 'dotenv/config';
+import { PrismaClient } from '@/lib/generated/prisma';
 import { PrismaNeon } from '@prisma/adapter-neon';
-import ws from 'ws';
+import { neonConfig } from '@neondatabase/serverless';
 
-// Sets up WebSocket connections, which enables Neon to use WebSocket communication.
+import ws from 'ws';
 neonConfig.webSocketConstructor = ws;
 
-// Creates a new connection pool using the provided connection string, allowing multiple concurrent connections.
-const connectionString = `${process.env.DATABASE_URL}`;
-const pool = new Pool({ connectionString });
 
-// Instantiates the Prisma adapter using the Neon connection pool to handle the connection between Prisma and Neon.
-const adapter = new PrismaNeon(pool as PoolConfig);
-
-const globalForPrisma = global as unknown as { 
-    prisma: PrismaClient
+// Type definitions
+declare global {
+  var prisma: PrismaClient | undefined
 }
 
-// We add the adapter to the PrismaClient
-const prisma = globalForPrisma.prisma || new PrismaClient({ adapter }).$extends(withAccelerate())
+const connectionString = `${process.env.DATABASE_URL}`;
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+const adapter = new PrismaNeon({ connectionString });
+const prisma = global.prisma || new PrismaClient({ adapter });
 
-export default prisma
+if (process.env.NODE_ENV === 'development') global.prisma = prisma;
+
+export default prisma;
