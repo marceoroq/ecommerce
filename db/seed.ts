@@ -6,12 +6,15 @@ async function main() {
     console.log('Starting database seeding...')
 
     await prisma.product.deleteMany()
-    console.log('Existing product data deleted.')
+    console.log('✅ Existing products data deleted.')
+    await prisma.user.deleteMany()
+    console.log('✅ Existing users data deleted.')
   
     await prisma.product.createMany({ data: sampleData.products })
-    console.log('Database seeding completed successfully')
+    await prisma.user.createMany({ data: sampleData.users })
+    console.log('✅ Database seeding completed successfully')
   } catch (error) {
-    console.error('Error during database seeding:', error);
+    console.error('❌ Error during database seeding:', error);
     process.exit(1)
   } finally {
     await prisma.$disconnect();
