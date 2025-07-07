@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { PanelRightOpen, ShoppingBag, User } from "lucide-react";
+import { PanelRightOpen, ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/shared/header/mode-toggle";
+import ModeToggle from "@/components/shared/header/mode-toggle";
+import UserButton from "@/components/shared/header/user-button";
 import {
   Sheet,
   SheetContent,
@@ -15,18 +16,18 @@ const Menu = () => {
   return (
     <div className="flex justify-end gap-3">
       {/* Desktop View */}
-      <nav className="hidden md:flex w-full max-w-xs gap-2">
+      <nav className="hidden md:flex w-full max-w-xs gap-2 items-center">
         <ModeToggle />
-        <Button asChild variant="ghost">
+        <Button
+          asChild
+          variant="ghost"
+          className="focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
           <Link href="/cart">
             <ShoppingBag /> Cart
           </Link>
         </Button>
-        <Button asChild>
-          <Link href="/signin">
-            <User /> Sign In
-          </Link>
-        </Button>
+        <UserButton />
       </nav>
       {/* Mobile View */}
       <nav className="md:hidden">
@@ -42,11 +43,7 @@ const Menu = () => {
                 <ShoppingBag /> Cart
               </Link>
             </Button>
-            <Button asChild>
-              <Link href="/signin">
-                <User /> Sign In
-              </Link>
-            </Button>
+            <UserButton />
             <SheetDescription></SheetDescription>
           </SheetContent>
         </Sheet>

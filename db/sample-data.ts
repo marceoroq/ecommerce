@@ -11,7 +11,7 @@ const sampleData = {
     {
       name: "Paul",
       email: "user@example.com",
-      password: hashSync("user", 10),
+      password: hashSync("user123", 10),
       role: "user",
     },
   ],

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useActionState } from "react";
+import { redirect } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
@@ -23,6 +24,8 @@ export function LoginForm({
     message: "",
     errors: {},
   });
+
+  if (state.success) redirect("/");
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
