@@ -6,15 +6,17 @@ import Link from "next/link";
 export default function NotFoundPage() {
   return (
     <div className="flex-center flex-col min-h-screen shadow-md">
-      <Card className="p-4 flex flex-col justify-center items-center">
-        <Logo className="size-16" />
-        <div className="flex p-4 flex-col justify-center">
-          <h1 className="text-xl font-extrabold text-center">Not Found</h1>
-          <p className="text-sm">Could not find requested page</p>
-          <Button className="mt-3" asChild variant="default">
-            <Link href="/">Back to Home</Link>
-          </Button>
+      <Card className="p-6 flex flex-col justify-center items-center gap-6">
+        <div className="flex flex-col justify-center items-center">
+          <Logo className="size-16" />
+          <h1 className="text-2xl font-bold">Page Not Found</h1>
+          <p className="text-balance text-muted-foreground">
+            Could not find requested page
+          </p>
         </div>
+        <Button asChild variant="default" className="w-full">
+          <Link href="/">Back to Home</Link>
+        </Button>
       </Card>
     </div>
   );
