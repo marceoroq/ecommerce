@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import Logo from "./shared/logo";
 
 export function LoginForm({
   className,
@@ -30,6 +31,9 @@ export function LoginForm({
           <form className="p-6 md:p-8" action={formAction}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
+                <Link href="/">
+                  <Logo className="size-16" />
+                </Link>
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-balance text-muted-foreground">
                   Login to your {APP_NAME} account
