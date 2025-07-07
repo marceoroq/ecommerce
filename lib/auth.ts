@@ -8,6 +8,9 @@ import prisma from "@/lib/prisma";
 import { getUserByEmail } from "@/lib/services/user.services";
 
 export const config = {
+  pages: {
+    signIn: "/signin",
+  },
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
