@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import Logo from "./shared/logo";
+import Logo from "@/components/shared/logo";
 
 export function LoginForm({
   className,

@@ -1,4 +1,4 @@
-import { SignUpForm } from "@/components/signup-form";
+import { SignUpForm } from "@/components/shared/auth/signup-form";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
