@@ -1,8 +1,11 @@
 "use server";
 
-import { signIn, signOut } from "@/lib/auth";
-import { signInFormSchema } from "../validators";
+import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
+
+import { signIn, signOut } from "@/lib/auth";
+import { signInFormSchema, signUpFormSchema } from "@/lib/validators";
+import { createUser } from "@/lib/services/user.services";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
@@ -65,6 +68,60 @@ export async function signInWithCredentials(
 
     // Any other unexpected error
     return { success: false, message: "An unexpected error occurred" };
+  }
+}
+
+export async function signUpWithCredentials(
+  prevState: unknown,
+  formData: FormData
+) {
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const confirmPassword = formData.get("confirmPassword");
+
+  try {
+    const validatedFields = signUpFormSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!validatedFields.success) {
+      return {
+        success: false,
+        message: "",
+        errors: validatedFields.error.flatten().fieldErrors,
+      };
+    }
+
+    const {
+      name: userName,
+      email: userEmail,
+      password: userPassword,
+    } = validatedFields.data;
+
+    await createUser({
+      name: userName,
+      email: userEmail,
+      password: hashSync(userPassword, 10),
+    });
+
+    await signIn("credentials", {
+      email: userEmail,
+      password: userPassword,
+      redirect: false,
+    });
+
+    return { success: true, message: "User created successfully" };
+  } catch (error) {
+    console.error("Sign-up error:", error);
+
+    return {
+      success: false,
+      message: "An unexpected error occurred. User was not registered",
+    };
   }
 }
 
