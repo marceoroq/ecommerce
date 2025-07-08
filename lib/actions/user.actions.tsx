@@ -5,7 +5,7 @@ import { AuthError } from "next-auth";
 
 import { signIn, signOut } from "@/lib/auth";
 import { signInFormSchema, signUpFormSchema } from "@/lib/validators";
-import { createUser } from "@/lib/services/user.services";
+import { createUser, getUserByEmail } from "@/lib/services/user.services";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
@@ -101,6 +101,15 @@ export async function signUpWithCredentials(
       email: userEmail,
       password: userPassword,
     } = validatedFields.data;
+
+    const foundUser = await getUserByEmail(userEmail);
+
+    if (foundUser) {
+      return {
+        success: false,
+        message: "Email already in use",
+      };
+    }
 
     await createUser({
       name: userName,
