@@ -1,9 +1,11 @@
-import ProductImages from "@/components/shared/product/product-images";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { getProductBySlugAction } from "@/lib/actions/product.actions";
 import { notFound } from "next/navigation";
+
+import { getProductBySlugAction } from "@/lib/actions/product.actions";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import ProductImages from "@/components/shared/product/product-images";
+import AddToCart from "@/components/shared/product/add-to-cart";
 
 interface ProductDetailsPageProps {
   params: Promise<{ slug: string }>;
@@ -20,6 +22,17 @@ export default async function ProductDetailsPage({
   }
 
   const hasStock = product.stock > 0;
+
+  // build the object to pass to add item to cart button
+  const { id, name, price, images } = product;
+  const cartItem = {
+    productId: id,
+    name,
+    slug,
+    price,
+    image: images![0],
+    quantity: 1,
+  };
 
   return (
     <section>
@@ -78,11 +91,7 @@ export default async function ProductDetailsPage({
                   </Badge>
                 )}
               </div>
-              {hasStock && (
-                <div className="mt-2 flex-center">
-                  <Button className="w-full">Add to Cart</Button>
-                </div>
-              )}
+              {hasStock && <AddToCart item={cartItem} />}
             </CardContent>
           </Card>
         </div>
