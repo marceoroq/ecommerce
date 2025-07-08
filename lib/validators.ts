@@ -38,3 +38,20 @@ export const signUpFormSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"], // this line is to associate the error with confirmPassword field
   });
+
+export const cartItemSchema = z.object({
+  productId: z.string().uuid("Invalid product ID format"),
+  name: z.string().min(1, "Product name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  image: z.string().min(1, "Image is required"),
+  price: currencyValidation,
+  quantity: z.number().int().min(1, "Quantity must be at least 1"),
+});
+
+export const insertCartSchema = z.object({
+  userId: z.string().uuid("Invalid User ID format").nullable().optional(),
+  items: z.array(cartItemSchema),
+  shippingPrice: currencyValidation,
+  taxPrice: currencyValidation,
+  sessionCartId: z.string().uuid("Invalid session ID format"),
+});
