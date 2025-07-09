@@ -26,7 +26,7 @@ const AddToCart = ({ item }: AddToCartProps) => {
     setIsLoading(false);
 
     if (!response.success) {
-      toast.error("Failed to add item to cart", {
+      return toast.error("Failed to add item to cart", {
         description: String(response.message) || "Please try again.",
       });
     }

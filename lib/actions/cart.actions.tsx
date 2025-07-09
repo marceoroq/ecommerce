@@ -2,6 +2,7 @@
 
 import zod from "zod";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
@@ -25,9 +26,9 @@ async function getUserAndSessionCartId() {
 
 export async function addItemToCartAction(itemData: CartItem) {
   try {
-    const product = await getProductById(itemData.productId);
+    const productInDB = await getProductById(itemData.productId);
 
-    if (!product) {
+    if (!productInDB) {
       return { success: false, message: "Product not found" };
     }
 
@@ -59,11 +60,16 @@ export async function addItemToCartAction(itemData: CartItem) {
       await createCart(validatedFields);
     } else {
       // Verify if the product exist in the cart
-      const isProductInCart = (cart.items as CartItem[]).some(
+      const productInCart = (cart.items as CartItem[]).find(
         (item) => item.productId === validatedItem.productId
       );
 
-      if (isProductInCart) {
+      if (productInCart) {
+        // Check stock
+        if (productInDB.stock < productInCart.quantity + 1) {
+          throw new Error("Not enough stock");
+        }
+
         // If the product is in the cart, we'll update its quantity.
         const updatedItems = (cart.items as CartItem[]).map((item) =>
           item.productId === validatedItem.productId
@@ -82,6 +88,8 @@ export async function addItemToCartAction(itemData: CartItem) {
       }
     }
 
+    revalidatePath(`/product/${productInDB.slug}`);
+
     return { success: true, message: "Product has been added to cart" };
   } catch (error) {
     console.error("Error in Cart Actions:", error);
@@ -94,6 +102,6 @@ export async function addItemToCartAction(itemData: CartItem) {
       };
     }
 
-    return { success: false, message: "An unexpected error occurred" };
+    return { success: false, message: String(error) };
   }
 }
