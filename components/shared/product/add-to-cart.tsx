@@ -2,7 +2,7 @@
 
 import { toast } from "sonner";
 import { useState } from "react";
-import { Product } from "@/types";
+import { CartItem } from "@/types";
 
 import { addItemToCartAction } from "@/lib/actions/cart.actions";
 
@@ -11,11 +11,7 @@ import { Spinner } from "@/components/shared/spinner";
 import { useRouter } from "next/navigation";
 
 type AddToCartProps = {
-  item: Pick<Product, "name" | "slug" | "price"> & {
-    productId: string;
-    image?: string;
-    quantity: number;
-  };
+  item: CartItem;
 };
 
 const AddToCart = ({ item }: AddToCartProps) => {
@@ -25,17 +21,17 @@ const AddToCart = ({ item }: AddToCartProps) => {
   const handleAddToCart = async () => {
     setIsLoading(true);
 
-    const response = await addItemToCartAction(item.productId);
+    const response = await addItemToCartAction(item);
 
     setIsLoading(false);
 
     if (!response.success) {
       toast.error("Failed to add item to cart", {
-        description: response.message || "Please try again.",
+        description: String(response.message) || "Please try again.",
       });
     }
 
-    toast.success("Product has been added to cart", {
+    toast.success(response.message, {
       description: item.name,
       action: {
         label: "Go To Cart",

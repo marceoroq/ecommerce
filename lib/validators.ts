@@ -39,7 +39,7 @@ export const signUpFormSchema = z
     path: ["confirmPassword"], // this line is to associate the error with confirmPassword field
   });
 
-export const cartItemSchema = z.object({
+export const insertCartItemSchema = z.object({
   productId: z.string().uuid("Invalid product ID format"),
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
@@ -50,7 +50,7 @@ export const cartItemSchema = z.object({
 
 export const insertCartSchema = z.object({
   userId: z.string().uuid("Invalid User ID format").nullable().optional(),
-  items: z.array(cartItemSchema),
+  items: z.array(insertCartItemSchema),
   shippingPrice: currencyValidation,
   taxPrice: currencyValidation,
   sessionCartId: z.string().uuid("Invalid session ID format"),

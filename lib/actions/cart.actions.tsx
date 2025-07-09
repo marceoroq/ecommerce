@@ -1,8 +1,99 @@
 "use server";
 
-import { delay } from "../utils";
+import zod from "zod";
+import { cookies } from "next/headers";
 
-export async function addItemToCartAction(productId: string) {
-  await delay(2000);
-  return { success: true, message: "Item added to cart successfully" };
+import { auth } from "@/lib/auth";
+import { Decimal } from "@/lib/generated/prisma/runtime/library";
+import { getProductById } from "@/lib/services/product.services";
+import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
+import { createCart, getCart, updateCart } from "@/lib/services/cart.services";
+import { CartItem } from "@/types";
+
+async function getUserAndSessionCartId() {
+  const session = await auth();
+  const userId = session?.user.id;
+
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+
+  if (!sessionCartId) {
+    throw new Error("Session Cart ID not found");
+  }
+
+  return [userId, sessionCartId];
+}
+
+export async function addItemToCartAction(itemData: CartItem) {
+  try {
+    const product = await getProductById(itemData.productId);
+
+    if (!product) {
+      return { success: false, message: "Product not found" };
+    }
+
+    // Prepare and validate cart item data to be added to the cart.
+    const validatedItem = insertCartItemSchema.parse(itemData);
+
+    // Get userId and sessionCartId to find cart in DB.
+    const [userId, sessionCartId] = await getUserAndSessionCartId();
+
+    // Get cart with userId or sessionCartId.
+    const cart = await getCart(userId ? { userId } : { sessionCartId });
+
+    // If the cart doesn't exist, we'll create it with the product to be added.
+    if (!cart) {
+      const shippingPrice = "10.00";
+      const taxPrice = new Decimal(validatedItem.price)
+        .mul(new Decimal(0.21))
+        .toFixed(2)
+        .toString();
+
+      const validatedFields = insertCartSchema.parse({
+        userId,
+        shippingPrice,
+        taxPrice,
+        sessionCartId,
+        items: [validatedItem],
+      });
+
+      await createCart(validatedFields);
+    } else {
+      // Verify if the product exist in the cart
+      const isProductInCart = (cart.items as CartItem[]).some(
+        (item) => item.productId === validatedItem.productId
+      );
+
+      if (isProductInCart) {
+        // If the product is in the cart, we'll update its quantity.
+        const updatedItems = (cart.items as CartItem[]).map((item) =>
+          item.productId === validatedItem.productId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+
+        await updateCart(cart.id, {
+          items: updatedItems,
+        });
+      } else {
+        // If the product isn't in the cart, we'll add it.
+        await updateCart(cart.id, {
+          items: [...(cart.items as CartItem[]), validatedItem],
+        });
+      }
+    }
+
+    return { success: true, message: "Product has been added to cart" };
+  } catch (error) {
+    console.error("Error in Cart Actions:", error);
+
+    if (error instanceof zod.ZodError) {
+      return {
+        success: false,
+        message: "Invalid format",
+        errors: error.errors,
+      };
+    }
+
+    return { success: false, message: "An unexpected error occurred" };
+  }
 }
