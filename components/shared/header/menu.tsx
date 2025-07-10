@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { PanelRightOpen, ShoppingBag } from "lucide-react";
 
-import { hasCartItems as hasCartItemsService } from "@/lib/services/cart.services";
+import { hasCartItems as hasCartItemsService } from "@/lib/actions/cart.actions";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,7 @@ import {
 } from "@/components/ui/sheet";
 
 const Menu = async () => {
-  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-  const hasCartItems = await hasCartItemsService(sessionCartId);
+  const hasCartItems = await hasCartItemsService();
 
   return (
     <div className="flex justify-end gap-3">
@@ -34,7 +32,7 @@ const Menu = async () => {
             <ShoppingBag /> Cart
             {hasCartItems && (
               <Badge
-                className="absolute top-2 left-6 h-2 w-2 p-0 rounded-full"
+                className="absolute top-2 left-6 h-2 w-2 p-0 rounded-full dark:bg-red-500"
                 variant="destructive"
               />
             )}

@@ -4,6 +4,7 @@ import zod from "zod";
 import { cookies } from "next/headers";
 
 import { auth } from "@/lib/auth";
+import { Cart } from "@/lib/generated/prisma";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
 import { getProductById } from "@/lib/services/product.services";
 import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
@@ -119,11 +120,8 @@ export async function decreaseCartItemQuantityAction(
   quantityToRemove: number
 ) {
   try {
-    // Get userId and sessionCartId to find cart in DB.
-    const [userId, sessionCartId] = await getUserAndSessionCartId();
-
-    // Get cart with userId or sessionCartId.
-    const cart = await getCart(userId ? { userId } : { sessionCartId });
+    // Get current cart
+    const cart = await getCurrentCart();
 
     if (!cart) {
       return { success: false, message: "Cart not found" };
@@ -169,8 +167,7 @@ export async function decreaseCartItemQuantityAction(
 
 export async function removeProductFromCartAction(productId: string) {
   try {
-    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-    const cart = await getCart({ sessionCartId });
+    const cart = await getCurrentCart();
 
     if (!cart) {
       return { success: false, message: "Cart not found" };
@@ -189,5 +186,47 @@ export async function removeProductFromCartAction(productId: string) {
     console.error("[removeProductFromCartAction Error]:", error);
 
     return { success: false, message: String(error) };
+  }
+}
+
+export async function getCurrentCart(): Promise<Cart | null> {
+  try {
+    const [userId, sessionCartId] = await getUserAndSessionCartId();
+
+    const cart = await getCart(userId ? { userId } : { sessionCartId });
+
+    return cart;
+  } catch (error) {
+    console.error("Error trying to get current cart", error);
+    throw new Error(`Error trying to get current cart: ${error}`);
+  }
+}
+
+export async function getCartItemQuantity(productId: string): Promise<number> {
+  try {
+    const cart = await getCurrentCart();
+
+    if (!cart) throw new Error("Cart not found");
+
+    return (
+      (cart?.items as CartItem[]).find((item) => item.productId === productId)
+        ?.quantity || 0
+    );
+  } catch (error) {
+    console.error("Error fetching cart item quantity:", error);
+    throw error;
+  }
+}
+
+export async function hasCartItems(): Promise<boolean> {
+  try {
+    const cart = await getCurrentCart();
+
+    if (!cart) throw new Error("Cart not found");
+
+    return Boolean((cart?.items as CartItem[]).length);
+  } catch (error) {
+    console.error("Error getting if cart has items:", error);
+    throw error;
   }
 }
