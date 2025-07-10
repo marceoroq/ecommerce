@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { CartItem } from "@/types";
 import { Cart as PrismaModel, Prisma } from "@/lib/generated/prisma";
 
 // ===========================================================
@@ -44,6 +45,18 @@ export async function getCartById(
     where: { id },
     ...options,
   });
+}
+
+export async function getCartItemQuantity(
+  productId: string,
+  sessionCartId: string | undefined
+): Promise<number> {
+  const cart = await getCart({ sessionCartId });
+
+  return (
+    (cart?.items as CartItem[]).find((item) => item.productId === productId)
+      ?.quantity || 0
+  );
 }
 
 // ===========================================================
