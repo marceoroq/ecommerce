@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { PanelRightOpen, ShoppingBag } from "lucide-react";
 
+import { hasCartItems as hasCartItemsService } from "@/lib/services/cart.services";
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ModeToggle from "@/components/shared/header/mode-toggle";
 import UserButton from "@/components/shared/header/user-button";
@@ -12,7 +16,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const Menu = () => {
+const Menu = async () => {
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+  const hasCartItems = await hasCartItemsService(sessionCartId);
+
   return (
     <div className="flex justify-end gap-3">
       {/* Desktop View */}
@@ -21,10 +28,16 @@ const Menu = () => {
         <Button
           asChild
           variant="ghost"
-          className="focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="relative focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <Link href="/cart">
             <ShoppingBag /> Cart
+            {hasCartItems && (
+              <Badge
+                className="absolute top-2 left-6 h-2 w-2 p-0 rounded-full"
+                variant="destructive"
+              />
+            )}
           </Link>
         </Button>
         <UserButton />

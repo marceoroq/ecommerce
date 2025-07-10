@@ -59,6 +59,13 @@ export async function getCartItemQuantity(
   );
 }
 
+export async function hasCartItems(
+  sessionCartId: string | undefined
+): Promise<boolean> {
+  const cart = await getCart({ sessionCartId });
+  return Boolean((cart?.items as CartItem[]).length);
+}
+
 // ===========================================================
 // WRITE OPERATIONS
 // ===========================================================
