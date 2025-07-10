@@ -2,7 +2,6 @@
 
 import zod from "zod";
 import { cookies } from "next/headers";
-import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
@@ -24,7 +23,7 @@ async function getUserAndSessionCartId() {
   return [userId, sessionCartId];
 }
 
-export async function addItemToCartAction(itemData: CartItem) {
+export async function manageCartItemAdditionAction(itemData: CartItem) {
   try {
     const productInDB = await getProductById(itemData.productId);
 
@@ -40,6 +39,9 @@ export async function addItemToCartAction(itemData: CartItem) {
 
     // Get cart with userId or sessionCartId.
     const cart = await getCart(userId ? { userId } : { sessionCartId });
+
+    // Create a variable to save the message to send in response.
+    let message = "Product has been added to cart";
 
     // If the cart doesn't exist, we'll create it with the product to be added.
     if (!cart) {
@@ -65,21 +67,26 @@ export async function addItemToCartAction(itemData: CartItem) {
       );
 
       if (productInCart) {
-        // Check stock
-        if (productInDB.stock < productInCart.quantity + 1) {
+        // Checks if the quantity to add exceeds the available stock
+        if (
+          productInDB.stock <
+          productInCart.quantity + validatedItem.quantity
+        ) {
           throw new Error("Not enough stock");
         }
 
-        // If the product is in the cart, we'll update its quantity.
+        // The product is in the cart, we'll update its quantity.
         const updatedItems = (cart.items as CartItem[]).map((item) =>
           item.productId === validatedItem.productId
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + validatedItem.quantity }
             : item
         );
 
         await updateCart(cart.id, {
           items: updatedItems,
         });
+
+        message = "Cart quantity updated for product.";
       } else {
         // If the product isn't in the cart, we'll add it.
         await updateCart(cart.id, {
@@ -88,11 +95,12 @@ export async function addItemToCartAction(itemData: CartItem) {
       }
     }
 
-    revalidatePath(`/product/${productInDB.slug}`);
+    // TODO: analize when will be neccessary
+    // revalidatePath(`/product/${productInDB.slug}`);
 
-    return { success: true, message: "Product has been added to cart" };
+    return { success: true, message };
   } catch (error) {
-    console.error("Error in Cart Actions:", error);
+    console.error("[manageCartItemAdditionAction Error]:", error);
 
     if (error instanceof zod.ZodError) {
       return {
@@ -101,6 +109,84 @@ export async function addItemToCartAction(itemData: CartItem) {
         errors: error.errors,
       };
     }
+
+    return { success: false, message: String(error) };
+  }
+}
+
+export async function decreaseCartItemQuantityAction(
+  productId: string,
+  quantityToRemove: number
+) {
+  try {
+    // Get userId and sessionCartId to find cart in DB.
+    const [userId, sessionCartId] = await getUserAndSessionCartId();
+
+    // Get cart with userId or sessionCartId.
+    const cart = await getCart(userId ? { userId } : { sessionCartId });
+
+    if (!cart) {
+      return { success: false, message: "Cart not found" };
+    }
+
+    let message = "Item removed from cart.";
+
+    // Checks if the current removal operation will result in zero
+    // quantity for this product in the cart.
+    const willRemoveAllQuantity =
+      (cart.items as CartItem[]).find((item) => item.productId === productId)
+        ?.quantity === quantityToRemove;
+
+    if (willRemoveAllQuantity) {
+      const updatedItems = (cart.items as CartItem[]).filter(
+        (item) => item.productId !== productId
+      );
+
+      await updateCart(cart.id, {
+        items: updatedItems,
+      });
+    } else {
+      // We'll update its quantity.
+      const updatedItems = (cart.items as CartItem[]).map((item) =>
+        item.productId === productId
+          ? { ...item, quantity: item.quantity - quantityToRemove }
+          : item
+      );
+
+      await updateCart(cart.id, {
+        items: updatedItems,
+      });
+
+      message = "Cart quantity updated for product.";
+    }
+
+    return { success: true, message };
+  } catch (error) {
+    console.error("[decreaseCartItemQuantityAction Error]:", error);
+    return { success: false, message: String(error) };
+  }
+}
+
+export async function removeProductFromCartAction(productId: string) {
+  try {
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+    const cart = await getCart({ sessionCartId });
+
+    if (!cart) {
+      return { success: false, message: "Cart not found" };
+    }
+
+    const updatedItems = (cart.items as CartItem[]).filter(
+      (item) => item.productId !== productId
+    );
+
+    await updateCart(cart.id, {
+      items: updatedItems,
+    });
+
+    return { success: true, message: "Item removed from cart." };
+  } catch (error) {
+    console.error("[removeProductFromCartAction Error]:", error);
 
     return { success: false, message: String(error) };
   }

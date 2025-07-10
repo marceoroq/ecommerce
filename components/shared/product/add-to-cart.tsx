@@ -1,50 +1,111 @@
 "use client";
 
 import { toast } from "sonner";
-import { useState } from "react";
 import { CartItem } from "@/types";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { addItemToCartAction } from "@/lib/actions/cart.actions";
+import {
+  decreaseCartItemQuantityAction,
+  manageCartItemAdditionAction,
+  removeProductFromCartAction,
+} from "@/lib/actions/cart.actions";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/shared/spinner";
-import { useRouter } from "next/navigation";
+import QuantityInput from "@/components/shared/product/quantity-input";
+import useDebounce from "@/hooks/useDebounce";
 
 type AddToCartProps = {
   item: CartItem;
+  quantity: number;
+  stock: number;
 };
 
-const AddToCart = ({ item }: AddToCartProps) => {
+const AddToCart = ({
+  item,
+  quantity: initialQuantity,
+  stock,
+}: AddToCartProps) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<number>(initialQuantity);
+  const debouncedQuantity = useDebounce(quantity, 1000);
 
-  const handleAddToCart = async () => {
-    setIsLoading(true);
+  useEffect(() => {
+    // Avoiding initial render
+    if (debouncedQuantity === initialQuantity) return;
 
-    const response = await addItemToCartAction(item);
+    // Calculate the net quantity change from the last known real quantity
+    const quantityDiff = debouncedQuantity - initialQuantity;
 
-    setIsLoading(false);
+    const updateCartInDb = async () => {
+      // Create a variable to save the action's response.
+      let response;
 
-    if (!response.success) {
-      return toast.error("Failed to add item to cart", {
-        description: String(response.message) || "Please try again.",
-      });
-    }
+      setIsLoading(true);
 
-    toast.success(response.message, {
-      description: item.name,
-      action: {
-        label: "Go To Cart",
-        onClick: () => router.push("/cart"),
-      },
-    });
+      if (debouncedQuantity === 0) {
+        response = await removeProductFromCartAction(item.productId);
+      } else if (quantityDiff > 0) {
+        response = await manageCartItemAdditionAction({
+          ...item,
+          quantity: quantityDiff,
+        });
+      } else {
+        response = await decreaseCartItemQuantityAction(
+          item.productId,
+          Math.abs(quantityDiff)
+        );
+      }
+
+      if (response.success) {
+        router.refresh();
+        toast.success(response.message, {
+          description: item.name,
+          action: {
+            label: "Go To Cart",
+            onClick: () => router.push("/cart"),
+          },
+        });
+      } else {
+        setQuantity(initialQuantity);
+        toast.error("Failed to update cart", {
+          description: String(response?.message) || "Please try again.",
+        });
+      }
+
+      setIsLoading(false);
+    };
+
+    updateCartInDb();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuantity]);
+
+  const handleIncreaseQuantity = () => {
+    setQuantity((prevValue: number) => prevValue + 1);
+  };
+
+  const handleDecreaseQuantity = () => {
+    setQuantity((prevValue: number) => prevValue - 1);
   };
 
   return (
-    <div className="mt-2 flex-center">
-      <Button onClick={handleAddToCart} disabled={isLoading} className="w-full">
-        {isLoading ? <Spinner /> : "Add to Cart"}
-      </Button>
+    <div className="mt-4 flex-center">
+      {quantity === 0 ? (
+        <Button onClick={handleIncreaseQuantity} className="w-full">
+          {isLoading ? <Spinner /> : "Add to Cart"}
+        </Button>
+      ) : (
+        <QuantityInput
+          max={stock}
+          isLoading={isLoading}
+          quantity={quantity}
+          onIncrease={handleIncreaseQuantity}
+          onDecrease={handleDecreaseQuantity}
+          className="w-full"
+        />
+      )}
     </div>
   );
 };

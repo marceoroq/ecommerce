@@ -1,11 +1,13 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
+import { getCartItemQuantity } from "@/lib/services/cart.services";
 import { getProductBySlugAction } from "@/lib/actions/product.actions";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
+import ProductImages from "@/components/shared/product/product-images";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ProductDetailsPageProps {
   params: Promise<{ slug: string }>;
@@ -20,6 +22,9 @@ export default async function ProductDetailsPage({
   if (!product) {
     notFound();
   }
+
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+  const cartItemQuantity = await getCartItemQuantity(product.id, sessionCartId);
 
   const hasStock = product.stock > 0;
 
@@ -91,7 +96,13 @@ export default async function ProductDetailsPage({
                   </Badge>
                 )}
               </div>
-              {hasStock && <AddToCart item={cartItem} />}
+              {hasStock && (
+                <AddToCart
+                  item={cartItem}
+                  quantity={cartItemQuantity}
+                  stock={product.stock}
+                />
+              )}
             </CardContent>
           </Card>
         </div>
