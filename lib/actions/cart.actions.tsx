@@ -4,12 +4,12 @@ import zod from "zod";
 import { cookies } from "next/headers";
 
 import { auth } from "@/lib/auth";
-import { Cart } from "@/lib/generated/prisma";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
 import { getProductById } from "@/lib/services/product.services";
+import { convertPrismaCartToPOJO } from "@/lib/serializer/cart.serializer";
 import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
 import { createCart, getCart, updateCart } from "@/lib/services/cart.services";
-import { CartItem } from "@/types";
+import { Cart, CartItem } from "@/types";
 
 async function getUserAndSessionCartId() {
   const session = await auth();
@@ -39,7 +39,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
     const [userId, sessionCartId] = await getUserAndSessionCartId();
 
     // Get cart with userId or sessionCartId.
-    const cart = await getCart(userId ? { userId } : { sessionCartId });
+    const cart = await getCurrentCart();
 
     // Create a variable to save the message to send in response.
     let message = "Product has been added to cart";
@@ -63,7 +63,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
       await createCart(validatedFields);
     } else {
       // Verify if the product exist in the cart
-      const productInCart = (cart.items as CartItem[]).find(
+      const productInCart = cart.items.find(
         (item) => item.productId === validatedItem.productId
       );
 
@@ -77,7 +77,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
         }
 
         // The product is in the cart, we'll update its quantity.
-        const updatedItems = (cart.items as CartItem[]).map((item) =>
+        const updatedItems = cart.items.map((item) =>
           item.productId === validatedItem.productId
             ? { ...item, quantity: item.quantity + validatedItem.quantity }
             : item
@@ -91,7 +91,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
       } else {
         // If the product isn't in the cart, we'll add it.
         await updateCart(cart.id, {
-          items: [...(cart.items as CartItem[]), validatedItem],
+          items: [...cart.items, validatedItem],
         });
       }
     }
@@ -132,11 +132,11 @@ export async function decreaseCartItemQuantityAction(
     // Checks if the current removal operation will result in zero
     // quantity for this product in the cart.
     const willRemoveAllQuantity =
-      (cart.items as CartItem[]).find((item) => item.productId === productId)
-        ?.quantity === quantityToRemove;
+      cart.items.find((item) => item.productId === productId)?.quantity ===
+      quantityToRemove;
 
     if (willRemoveAllQuantity) {
-      const updatedItems = (cart.items as CartItem[]).filter(
+      const updatedItems = cart.items.filter(
         (item) => item.productId !== productId
       );
 
@@ -145,7 +145,7 @@ export async function decreaseCartItemQuantityAction(
       });
     } else {
       // We'll update its quantity.
-      const updatedItems = (cart.items as CartItem[]).map((item) =>
+      const updatedItems = cart.items.map((item) =>
         item.productId === productId
           ? { ...item, quantity: item.quantity - quantityToRemove }
           : item
@@ -173,7 +173,7 @@ export async function removeProductFromCartAction(productId: string) {
       return { success: false, message: "Cart not found" };
     }
 
-    const updatedItems = (cart.items as CartItem[]).filter(
+    const updatedItems = cart.items.filter(
       (item) => item.productId !== productId
     );
 
@@ -195,7 +195,9 @@ export async function getCurrentCart(): Promise<Cart | null> {
 
     const cart = await getCart(userId ? { userId } : { sessionCartId });
 
-    return cart;
+    if (!cart) return null;
+
+    return convertPrismaCartToPOJO(cart);
   } catch (error) {
     console.error("Error trying to get current cart", error);
     throw new Error(`Error trying to get current cart: ${error}`);
@@ -209,8 +211,7 @@ export async function getCartItemQuantity(productId: string): Promise<number> {
     if (!cart) throw new Error("Cart not found");
 
     return (
-      (cart?.items as CartItem[]).find((item) => item.productId === productId)
-        ?.quantity || 0
+      cart?.items.find((item) => item.productId === productId)?.quantity || 0
     );
   } catch (error) {
     console.error("Error fetching cart item quantity:", error);
@@ -224,7 +225,7 @@ export async function hasCartItems(): Promise<boolean> {
 
     if (!cart) throw new Error("Cart not found");
 
-    return Boolean((cart?.items as CartItem[]).length);
+    return Boolean(cart?.items.length);
   } catch (error) {
     console.error("Error getting if cart has items:", error);
     throw error;

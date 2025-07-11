@@ -13,8 +13,10 @@ export type Product = z.infer<typeof insertProductSchema> & {
   updateAt: Date;
 };
 
-export type Cart = z.infer<typeof insertCartSchema>;
 export type CartItem = z.infer<typeof insertCartItemSchema>;
+export type Cart = z.infer<typeof insertCartSchema> & {
+  id: string;
+};
 
 export type FieldErrors = {
   email?: string[];
