@@ -2,24 +2,18 @@
 
 import { CartItem } from "@/types";
 
-import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/shared/spinner";
 import QuantityInput from "@/components/shared/product/quantity-input";
 import useDebouncedCartQuantity from "@/hooks/useDebouncedCartQuantity";
 
 type AddToCartProps = {
   item: CartItem;
-  quantity: number;
   stock: number;
 };
 
-const AddToCart = ({
-  item,
-  quantity: initialQuantity,
-  stock,
-}: AddToCartProps) => {
+const TableQuantity = ({ item, stock }: AddToCartProps) => {
   const { quantity, setQuantity, isLoading } = useDebouncedCartQuantity(
-    initialQuantity,
+    item.quantity,
     item,
     1000
   );
@@ -33,23 +27,22 @@ const AddToCart = ({
   };
 
   return (
-    <div className="mt-4 flex-center">
+    <div className="flex-center">
       {quantity === 0 ? (
-        <Button onClick={handleIncreaseQuantity} className="w-full">
-          {isLoading ? <Spinner /> : "Add to Cart"}
-        </Button>
+        <Spinner className="w-32" />
       ) : (
         <QuantityInput
           max={stock}
           isLoading={isLoading}
           quantity={quantity}
+          withBorders={false}
           onIncrease={handleIncreaseQuantity}
           onDecrease={handleDecreaseQuantity}
-          className="w-full"
+          className="w-32"
         />
       )}
     </div>
   );
 };
 
-export default AddToCart;
+export default TableQuantity;

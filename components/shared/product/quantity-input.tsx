@@ -8,6 +8,7 @@ interface QuantityInputProps {
   quantity: number;
   min?: number;
   max?: number | null;
+  withBorders?: boolean;
   disabled?: boolean;
   isLoading?: boolean;
   onIncrease: VoidFunction;
@@ -19,6 +20,7 @@ const QuantityInput = ({
   className,
   disabled = false,
   isLoading = false,
+  withBorders = true,
   max = null,
   min = 0,
   onIncrease,
@@ -55,7 +57,12 @@ const QuantityInput = ({
           <Minus size={16} strokeWidth={2} aria-hidden="true" />
         )}
       </button>
-      <p className="w-full border-y px-2 py-1.5 text-center font-mono outline-none">
+      <p
+        className={cn(
+          "w-full px-2 py-1.5 text-center font-mono outline-none",
+          withBorders && "border-y"
+        )}
+      >
         {isLoading ? <Spinner className="w-full size-6" /> : quantity}
       </p>
       <button
