@@ -1,6 +1,8 @@
 import ProductList from "@/components/shared/product/product-list";
 import { getProductsAction } from "@/lib/actions/product.actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const productsList = await getProductsAction();
 
