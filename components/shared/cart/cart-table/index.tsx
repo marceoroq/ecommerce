@@ -9,7 +9,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -21,10 +20,6 @@ type CartTableProps = {
 };
 
 const CartTable = ({ cartItems }: CartTableProps) => {
-  const total = cartItems.reduce((acc, item) => {
-    return acc + Number(item.price) * item.quantity;
-  }, 0);
-
   return (
     <Table>
       <TableHeader>
@@ -41,7 +36,7 @@ const CartTable = ({ cartItems }: CartTableProps) => {
             <TableCell className="font-medium">
               <Link
                 href={`/product/${item.slug}`}
-                className="flex items-center"
+                className="flex items-center gap-2"
               >
                 <Image
                   className="rounded-sm"
@@ -50,7 +45,7 @@ const CartTable = ({ cartItems }: CartTableProps) => {
                   width={90}
                   height={150}
                 />
-                {item.name}
+                <p>{item.name}</p>
               </Link>
             </TableCell>
             <TableCell className="text-center">{item.price}</TableCell>
@@ -63,12 +58,6 @@ const CartTable = ({ cartItems }: CartTableProps) => {
           </TableRow>
         ))}
       </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">${total}</TableCell>
-        </TableRow>
-      </TableFooter>
     </Table>
   );
 };
