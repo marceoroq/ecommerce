@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -36,7 +38,9 @@ const CartDetails = ({
           <div className="font-medium">Total</div>
           <div className="font-medium">$ {total.toFixed(2)}</div>
         </div>
-        <Button className="mt-2">Proceed to Checkout</Button>
+        <Button asChild className="mt-2">
+          <Link href="/shipping-address">Proceed to Checkout</Link>
+        </Button>
       </CardContent>
     </Card>
   );
