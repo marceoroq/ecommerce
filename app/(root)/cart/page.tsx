@@ -1,6 +1,9 @@
+import { cn } from "@/lib/utils";
+
+import { getCurrentCart } from "@/lib/actions/cart.actions";
+
 import CartDetails from "@/components/shared/cart/cart-details";
 import CartTable from "@/components/shared/cart/cart-table";
-import { getCurrentCart } from "@/lib/actions/cart.actions";
 
 export const metadata = {
   title: "Shopping Cart",
@@ -22,7 +25,12 @@ export default async function CartPage() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-7">
       {/* Products List */}
-      <section className="flex flex-col min-h-96 col-span-5 p-5">
+      <section
+        className={cn(
+          "flex flex-col min-h-96 p-5",
+          showEmptyState ? "col-span-7" : "col-span-5"
+        )}
+      >
         <h1 className="py-4 h2-bold">Shopping Cart</h1>
         {showEmptyState ? (
           <div className="flex-center flex-grow">Cart is empty</div>
@@ -31,13 +39,15 @@ export default async function CartPage() {
         )}
       </section>
 
-      <aside className="col-span-2 p-5">
-        <CartDetails
-          subTotal={subTotal}
-          taxPrice={Number(cart?.taxPrice)}
-          shippingPrice={Number(cart?.shippingPrice)}
-        />
-      </aside>
+      {!showEmptyState && (
+        <aside className="col-span-2 p-5">
+          <CartDetails
+            subTotal={subTotal}
+            taxPrice={Number(cart?.taxPrice)}
+            shippingPrice={Number(cart?.shippingPrice)}
+          />
+        </aside>
+      )}
     </div>
   );
 }
