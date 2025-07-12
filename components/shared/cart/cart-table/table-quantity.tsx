@@ -29,7 +29,7 @@ const TableQuantity = ({ item, stock }: AddToCartProps) => {
   return (
     <div className="flex-center">
       {quantity === 0 ? (
-        <Spinner className="w-32" />
+        <Spinner />
       ) : (
         <QuantityInput
           max={stock}
