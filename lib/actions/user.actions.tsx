@@ -3,9 +3,21 @@
 import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
 
-import { signIn, signOut } from "@/lib/auth";
-import { signInFormSchema, signUpFormSchema } from "@/lib/validators";
-import { createUser, getUserByEmail } from "@/lib/services/user.services";
+import { auth, signIn, signOut } from "@/lib/auth";
+import {
+  shippingAddressSchema,
+  signInFormSchema,
+  signUpFormSchema,
+} from "@/lib/validators";
+
+import {
+  createUser,
+  getUserByEmail,
+  getUserById,
+  updateUser,
+} from "@/lib/services/user.services";
+
+import { ShippingAddress } from "@/types";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
@@ -136,4 +148,20 @@ export async function signUpWithCredentials(
 
 export async function signOutAction() {
   await signOut();
+}
+
+export async function updateUserAddressAction(data: ShippingAddress) {
+  try {
+    const session = await auth();
+    const currentUser = await getUserById(session?.user.id || "");
+    if (!currentUser) throw new Error("User not found");
+
+    const validatedAddress = shippingAddressSchema.parse(data);
+    await updateUser(currentUser.id, { address: validatedAddress });
+
+    return { success: true, message: "User address updated successfully" };
+  } catch (error) {
+    console.error(`[UPDATE USER ADDRESS ACTION ERROR]: ${error}`);
+    return { success: false, message: error };
+  }
 }

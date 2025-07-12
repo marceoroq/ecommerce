@@ -2,9 +2,17 @@
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { shippingAddressSchema } from "@/lib/validators";
+
 import { ShippingAddress } from "@/types";
+import { shippingAddressSchema } from "@/lib/validators";
+import { updateUserAddressAction } from "@/lib/actions/user.actions";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/shared/spinner";
 import {
   Form,
   FormControl,
@@ -13,25 +21,37 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 import { SHIPPING_ADDRESS_DEFAULT } from "@/lib/constants";
+import { toast } from "sonner";
 
 type ShippingAddressFormProps = {
   address?: ShippingAddress;
 };
 
 const ShippingAddressForm = ({ address }: ShippingAddressFormProps) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof shippingAddressSchema>>({
     resolver: zodResolver(shippingAddressSchema),
     defaultValues: address || SHIPPING_ADDRESS_DEFAULT,
   });
 
-  function onSubmit(values: z.infer<typeof shippingAddressSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof shippingAddressSchema>) {
+    setIsLoading(true);
+
+    const response = await updateUserAddressAction(values);
+
+    if (!response.success) {
+      toast.error("Failed to save shipping address", {
+        description: String(response.message),
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    router.push("/payment-method");
   }
 
   return (
@@ -119,8 +139,8 @@ const ShippingAddressForm = ({ address }: ShippingAddressFormProps) => {
               </FormItem>
             )}
           />
-          <Button className="mt-8" type="submit">
-            Continue
+          <Button className="mt-8 w-24" type="submit" disabled={isLoading}>
+            {isLoading ? <Spinner /> : "Continue"}
           </Button>
         </form>
       </Form>
