@@ -3,10 +3,10 @@ import { PanelRightOpen, ShoppingBag } from "lucide-react";
 
 import { hasCartItems as hasCartItemsService } from "@/lib/actions/cart.actions";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import ModeToggle from "@/components/shared/header/mode-toggle";
+import CartBadge from "@/components/shared/header/cart-badge";
 import UserButton from "@/components/shared/header/user-button";
+import ModeToggle from "@/components/shared/header/mode-toggle";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -30,12 +30,7 @@ const Menu = async () => {
         >
           <Link href="/cart">
             <ShoppingBag /> Cart
-            {hasCartItems && (
-              <Badge
-                className="absolute top-2 left-6 h-2 w-2 p-0 rounded-full dark:bg-red-500"
-                variant="destructive"
-              />
-            )}
+            <CartBadge hasItems={hasCartItems} />
           </Link>
         </Button>
         <UserButton />
