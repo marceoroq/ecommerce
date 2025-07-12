@@ -208,8 +208,6 @@ export async function getCartItemQuantity(productId: string): Promise<number> {
   try {
     const cart = await getCurrentCart();
 
-    if (!cart) throw new Error("Cart not found");
-
     return (
       cart?.items.find((item) => item.productId === productId)?.quantity || 0
     );
@@ -222,8 +220,6 @@ export async function getCartItemQuantity(productId: string): Promise<number> {
 export async function hasCartItems(): Promise<boolean> {
   try {
     const cart = await getCurrentCart();
-
-    if (!cart) throw new Error("Cart not found");
 
     return Boolean(cart?.items.length);
   } catch (error) {
