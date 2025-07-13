@@ -62,10 +62,7 @@ const UserButton = async () => {
           <DropdownMenuItem>Admin Panel</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={signOutAction}>
-          Log out
-          {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={signOutAction}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

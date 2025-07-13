@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useActionState } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { APP_NAME } from "@/lib/constants";
@@ -25,7 +25,10 @@ export function LoginForm({
     errors: {},
   });
 
-  if (state.success) redirect("/");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
+  if (state.success) redirect(callbackUrl);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -34,6 +37,7 @@ export function LoginForm({
           <div className="relative hidden bg-muted md:block">
             <Image
               src="/images/signin-picture.png"
+              priority
               alt="Image"
               width={760}
               height={1000}
@@ -60,6 +64,7 @@ export function LoginForm({
                   placeholder="admin@example.com"
                   required
                   autoComplete="email"
+                  defaultValue={process.env.SIGNIN_DEFAULT_VALUE_EMAIL}
                 />
               </div>
               <div className="grid gap-2">
@@ -78,6 +83,7 @@ export function LoginForm({
                   name="password"
                   required
                   autoComplete="password"
+                  defaultValue={process.env.SIGNIN_DEFAULT_VALUE_PASSWORD}
                 />
               </div>
               <div className="flex flex-col gap-2">

@@ -147,7 +147,12 @@ export async function signUpWithCredentials(
 }
 
 export async function signOutAction() {
-  await signOut();
+  await signOut({
+    // Redirect to homepage after sign out to avoid landing back on a protected route.
+    // If we log out from a protected page and don't redirect, the login page will appear
+    // with a callback to that same protected page, leading to an unnecessary loop.
+    redirectTo: "/",
+  });
 }
 
 export async function updateUserAddressAction(data: ShippingAddress) {

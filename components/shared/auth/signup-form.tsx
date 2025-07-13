@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useActionState } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { signUpWithCredentials } from "@/lib/actions/user.actions";
@@ -60,7 +60,10 @@ export function SignUpForm({
 
   const fieldErrors: FieldErrors = state.errors || {};
 
-  if (state.success) redirect("/");
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
+  if (state.success) redirect(callbackUrl);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
