@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
+export const config = {
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|signin|signup|public|assets).*)",
+  ],
+};
+
 export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // This is a base response to continue with request flow
