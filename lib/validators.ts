@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { PAYMENT_METHODS } from "@/lib/constants";
+
 const currencyValidation = z
   .string()
   .refine(
@@ -65,4 +67,13 @@ export const shippingAddressSchema = z.object({
   country: z.string().min(3, "Country must be at least 3 characters"),
   lat: z.number().optional(),
   lng: z.number().optional(),
+});
+
+export const paymentMethodSchema = z.object({
+  type: z
+    .string()
+    .min(1, "Payment method is required")
+    .refine((value) => PAYMENT_METHODS.includes(value), {
+      message: "Invalid payment method",
+    }),
 });

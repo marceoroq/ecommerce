@@ -4,6 +4,7 @@ import {
   insertProductSchema,
   insertCartItemSchema,
   shippingAddressSchema,
+  paymentMethodSchema,
 } from "@/lib/validators";
 
 export type Product = z.infer<typeof insertProductSchema> & {
@@ -28,3 +29,5 @@ export type FieldErrors = {
   confirmPassword?: string[];
   [key: string]: string[] | undefined;
 };
+
+export type PaymentMethod = z.infer<typeof paymentMethodSchema>;

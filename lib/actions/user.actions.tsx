@@ -5,6 +5,7 @@ import { AuthError } from "next-auth";
 
 import { auth, signIn, signOut } from "@/lib/auth";
 import {
+  paymentMethodSchema,
   shippingAddressSchema,
   signInFormSchema,
   signUpFormSchema,
@@ -17,7 +18,7 @@ import {
   updateUser,
 } from "@/lib/services/user.services";
 
-import { ShippingAddress } from "@/types";
+import { PaymentMethod, ShippingAddress } from "@/types";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
@@ -167,6 +168,25 @@ export async function updateUserAddressAction(data: ShippingAddress) {
     return { success: true, message: "User address updated successfully" };
   } catch (error) {
     console.error(`[UPDATE USER ADDRESS ACTION ERROR]: ${error}`);
+    return { success: false, message: error };
+  }
+}
+
+export async function updateUserPaymentMethodAction(data: PaymentMethod) {
+  try {
+    const session = await auth();
+    const currentUser = await getUserById(session?.user.id || "");
+    if (!currentUser) throw new Error("User not found");
+
+    const validatedMethod = paymentMethodSchema.parse(data);
+    await updateUser(currentUser.id, { paymentMethod: validatedMethod.type });
+
+    return {
+      success: true,
+      message: "User payment method updated successfully",
+    };
+  } catch (error) {
+    console.error(`[UPDATE PAYMENT METHOD ACTION ERROR]: ${error}`);
     return { success: false, message: error };
   }
 }

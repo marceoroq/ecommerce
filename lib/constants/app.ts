@@ -12,3 +12,5 @@ export const SHIPPING_ADDRESS_DEFAULT = {
   postalCode: "",
   country: "",
 };
+
+export const PAYMENT_METHODS = ["paypal", "stripe", "cash"];
