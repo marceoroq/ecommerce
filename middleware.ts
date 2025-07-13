@@ -1,11 +1,14 @@
+import NextAuth from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { authConfig } from "@/auth.config";
 
 export const config = {
   matcher: [
     "/((?!api|_next/static|_next/image|favicon.ico|signin|signup|public|assets).*)",
   ],
 };
+
+const { auth } = NextAuth(authConfig);
 
 export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
