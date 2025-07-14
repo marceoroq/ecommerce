@@ -61,7 +61,7 @@ const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
       <div className="flex flex-col gap-1">
         <h1 className="h2-bold">Payment Method</h1>
         <p className="text-sm text-muted-foreground">
-          Please select a payment method to continue
+          Please confirm a payment method to continue
         </p>
       </div>
       <Form {...form}>
