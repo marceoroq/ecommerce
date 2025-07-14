@@ -1,20 +1,20 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 
-type CartDetailsProps = {
+type OrderPricingDetailsProps = {
   subTotal: number;
   taxPrice: number;
   shippingPrice: number;
 };
 
-const CartDetails = ({
+const OrderPricingDetails = ({
   subTotal,
   taxPrice,
   shippingPrice,
-}: CartDetailsProps) => {
+}: OrderPricingDetailsProps) => {
   const total = subTotal + taxPrice + shippingPrice;
 
   return (
@@ -39,11 +39,11 @@ const CartDetails = ({
           <div className="font-medium">$ {total.toFixed(2)}</div>
         </div>
         <Button asChild className="mt-2">
-          <Link href="/shipping-address">Proceed to Checkout</Link>
+          <Link href="/shipping-address">Create Order</Link>
         </Button>
       </CardContent>
     </Card>
   );
 };
 
-export default CartDetails;
+export default OrderPricingDetails;
