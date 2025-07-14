@@ -1,11 +1,18 @@
-import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { getUserById } from "@/lib/services/user.services";
+import PaymentMethodForm from "@/components/shared/checkout/payment-method-form";
 
-export default function PaymentMethodPage() {
+export default async function PaymentMethodPage() {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) throw new Error("No user ID");
+
+  const user = await getUserById(userId);
+
   return (
     <div className="flex flex-col">
-      Payment Method Page
-      <Link href="/shipping-address"> {"<"} Back Step</Link>
-      <Link href="/place-order">Next Step {">"} </Link>
+      <PaymentMethodForm paymentMethod={user?.paymentMethod} />
     </div>
   );
 }

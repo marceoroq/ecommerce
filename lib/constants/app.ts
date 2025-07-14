@@ -14,3 +14,4 @@ export const SHIPPING_ADDRESS_DEFAULT = {
 };
 
 export const PAYMENT_METHODS = ["paypal", "stripe", "cash"];
+export const PAYMENT_METHOD_DEFAULT = "stripe";
