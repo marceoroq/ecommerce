@@ -50,7 +50,7 @@ model User {
   address       Json?   @db.Json
   paymentMethod String?
   Cart          Cart?
-  Order         Order?
+  Order         Order[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -124,7 +124,7 @@ model Order {
   deliveredAt     DateTime?   @db.Timestamp(6)
   OrderItem       OrderItem[]
 
-  userId String @unique @db.Uuid
+  userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())

@@ -1,8 +1,6 @@
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
+import CreateOrderButton from "@/components/shared/place-order/create-order-button";
 
 type OrderPricingDetailsProps = {
   subTotal: number;
@@ -38,9 +36,7 @@ const OrderPricingDetails = ({
           <div className="font-medium">Total</div>
           <div className="font-medium">$ {total.toFixed(2)}</div>
         </div>
-        <Button asChild className="mt-2">
-          <Link href="/shipping-address">Create Order</Link>
-        </Button>
+        <CreateOrderButton />
       </CardContent>
     </Card>
   );
