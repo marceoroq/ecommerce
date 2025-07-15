@@ -26,9 +26,9 @@ export async function getOrders(
  */
 export async function getOrderById(
   id: string,
-  options?: Prisma.OrderFindUniqueArgs
+  options?: Prisma.OrderFindFirstArgs
 ): Promise<PrismaModel | null> {
-  return await prisma.order.findUnique({
+  return await prisma.order.findFirst({
     where: { id },
     ...options,
   });

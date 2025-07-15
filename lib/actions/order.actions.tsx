@@ -1,10 +1,11 @@
 "use server";
 
 import { auth } from "@/lib/auth";
+import { Order } from "@/lib/generated/prisma";
 import { getUserById } from "@/lib/services/user.services";
-import { createOrder } from "@/lib/services/order.services";
 import { getCurrentCart } from "@/lib/actions/cart.actions";
 import { insertOrderSchema } from "@/lib/validators";
+import { createOrder, getOrderById } from "@/lib/services/order.services";
 
 export async function createOrderAction() {
   try {
@@ -78,5 +79,20 @@ export async function createOrderAction() {
   } catch (error) {
     console.error("[Create Order Action Error]:", error);
     return { success: false, message: String(error) };
+  }
+}
+
+export async function getOrderByIdAction(id: string): Promise<Order | null> {
+  try {
+    const order = await getOrderById(id, {
+      include: {
+        OrderItem: true,
+        user: { select: { name: true, email: true } },
+      },
+    });
+    return order;
+  } catch (error) {
+    console.error("[Get Order by ID Action Error]:", error);
+    return null;
   }
 }
