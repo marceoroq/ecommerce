@@ -12,6 +12,7 @@ export async function getProductsAction(): Promise<Product[]> {
     const products = await getProducts();
     return convertPrismaProductsToPOJO(products);
   } catch (error) {
+    console.error("[Error in getProductsAction]:", error);
     throw new Error(
       `Failed to fetch products: ${
         error instanceof Error ? error.message : String(error)

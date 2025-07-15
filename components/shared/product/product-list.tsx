@@ -1,35 +1,26 @@
 import ProductCard from "@/components/shared/product/product-card";
+import { getProductsAction } from "@/lib/actions/product.actions";
 import { Product } from "@/types";
 
-const ProductList = ({
-  data,
-  title,
-  limit,
-}: {
-  data: Product[];
-  title?: string;
-  limit?: number;
-}) => {
-  const hasProducts = data.length > 0;
-  const limitedData = limit ? data.slice(0, limit) : data;
+const ProductList = async () => {
+  const productsList = await getProductsAction();
+
+  const limit = 4;
+  const hasProducts = productsList.length > 0;
+  const limitedData = limit ? productsList.slice(0, limit) : productsList;
 
   return (
-    <div className="my-10">
-      <h2 className="h2-bold mb-4">{title}</h2>
+    <>
       {hasProducts ? (
-        <div>
-          <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {limitedData.map((product: Product) => (
-              <ProductCard key={product.slug} product={product} />
-            ))}
-          </div>
+        <div className="grid gap-2 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {limitedData.map((product: Product) => (
+            <ProductCard key={product.slug} product={product} />
+          ))}
         </div>
       ) : (
-        <div>
-          <p>No products found</p>
-        </div>
+        <p>No products found</p>
       )}
-    </div>
+    </>
   );
 };
 
