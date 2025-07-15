@@ -3,10 +3,9 @@
 import { z } from "zod";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
 import { SiPaypal } from "react-icons/si";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTransition } from "react";
 import { FaRegCreditCard, FaMoneyBillWave } from "react-icons/fa6";
 
 import { PaymentMethod } from "@/types";
@@ -32,28 +31,22 @@ type PaymentMethodFormProps = {
 };
 
 const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof paymentMethodSchema>>({
     resolver: zodResolver(paymentMethodSchema),
     defaultValues: { type: paymentMethod || PAYMENT_METHOD_DEFAULT },
   });
 
-  async function onSubmit(value: PaymentMethod) {
-    setIsLoading(true);
-
-    const response = await updateUserPaymentMethodAction(value);
-
-    if (!response.success) {
-      toast.error("Failed to save payment method", {
-        description: String(response.message),
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    router.push("/place-order");
+  function onSubmit(value: PaymentMethod) {
+    startTransition(async () => {
+      const response = await updateUserPaymentMethodAction(value);
+      if (!response.success) {
+        toast.error("Failed to save payment method", {
+          description: String(response.message),
+        });
+      }
+    });
   }
 
   return (
@@ -127,8 +120,8 @@ const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
               </FormItem>
             )}
           />
-          <Button className="mt-8 w-24" type="submit" disabled={isLoading}>
-            {isLoading ? <Spinner /> : "Continue"}
+          <Button className="mt-8 w-24" type="submit" disabled={isPending}>
+            {isPending ? <Spinner /> : "Continue"}
           </Button>
         </form>
       </Form>

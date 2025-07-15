@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
 
@@ -176,17 +177,15 @@ export async function updateUserPaymentMethodAction(data: PaymentMethod) {
   try {
     const session = await auth();
     const currentUser = await getUserById(session?.user.id || "");
+
     if (!currentUser) throw new Error("User not found");
 
     const validatedMethod = paymentMethodSchema.parse(data);
     await updateUser(currentUser.id, { paymentMethod: validatedMethod.type });
-
-    return {
-      success: true,
-      message: "User payment method updated successfully",
-    };
   } catch (error) {
     console.error(`[UPDATE PAYMENT METHOD ACTION ERROR]: ${error}`);
     return { success: false, message: error };
   }
+
+  redirect("/place-order");
 }
