@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getProductBySlug } from "@/lib/data/product.dal";
+import { ProductService } from "@/lib/services/product.services";
 import { getCartItemQuantity } from "@/lib/actions/cart.actions";
 
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ export default async function ProductDetailsPage({
   params,
 }: ProductDetailsPageProps) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
+  const product = await ProductService.getProductBySlug(slug);
 
   if (!product) {
     notFound();

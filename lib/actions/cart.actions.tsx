@@ -6,11 +6,11 @@ import { cookies } from "next/headers";
 import { auth } from "@/lib/auth";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
 
+import { ProductService } from "@/lib/services/product.services";
 import { convertPrismaCartToPOJO } from "@/lib/serializer/cart.serializer";
 import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
 import { createCart, getCart, updateCart } from "@/lib/services/cart.services";
 import { Cart, CartItem } from "@/types";
-import { getProductById } from "@/lib/data/product.dal";
 
 async function getUserAndSessionCartId() {
   const session = await auth();
@@ -27,7 +27,7 @@ async function getUserAndSessionCartId() {
 
 export async function manageCartItemAdditionAction(itemData: CartItem) {
   try {
-    const productInDB = await getProductById(itemData.productId);
+    const productInDB = await ProductService.getProductById(itemData.productId);
 
     if (!productInDB) {
       return { success: false, message: "Product not found" };

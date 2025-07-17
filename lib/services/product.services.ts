@@ -1,110 +1,49 @@
 import "server-only";
 
-import prisma from "@/lib/prisma";
-import { Product as PrismaModel, Prisma } from "@/lib/generated/prisma";
+import { Product } from "@/types";
+import { toPlainObject } from "@/lib/utils";
+import { handleDalError } from "@/lib/data/error-handler";
+import { Product as PrismaProduct } from "@/lib/generated/prisma";
+import { ProductRepository } from "@/lib/data/product.repository";
 
-// ===========================================================
-// READ OPERATIONS
-// ===========================================================
-
-/**
- * Retrieves multiple Product records from the database.
- * @param options Prisma findMany options (where, orderBy, include, select, etc.)
- * @returns A list of Product records.
- */
-export async function getProducts(
-  options?: Prisma.ProductFindManyArgs
-): Promise<PrismaModel[]> {
-  return await prisma.product.findMany(options);
+function convertPrismaProductToPOJO(product: PrismaProduct): Product {
+  return {
+    ...toPlainObject(product),
+    price: product.price.toFixed(2).toString(),
+    rating: product.rating.toNumber(),
+  };
 }
 
-/**
- * Retrieves a single Product record by a unique field (e.g., slug, email).
- * @param fieldName The name of the unique field (e.g., 'slug', 'email').
- * @param value The value of the unique field.
- * @param options Prisma findUnique options (include, select, etc.)
- * @returns The Product record or null if not found.
- */
-export async function getProductBy(
-  where: Prisma.ProductWhereInput,
-  options?: Prisma.ProductFindUniqueArgs
-): Promise<PrismaModel | null> {
-  return await prisma.product.findFirst({
-    where,
-    ...options,
-  });
-}
+export const ProductService = {
+  getProducts: async (): Promise<Product[]> => {
+    try {
+      const products = await ProductRepository.findAll();
 
-// ===========================================================
-// WRITE OPERATIONS
-// ===========================================================
+      return products.map((product) => convertPrismaProductToPOJO(product));
+    } catch (error) {
+      handleDalError(error, "getAllProducts");
+    }
+  },
 
-/**
- * Creates a new Product record.
- * @param data The data for the new Product. Define a specific interface for clarity.
- * Example: { name: string, description: string, price: number }
- * @returns The newly created Product record.
- */
-export async function createProduct(
-  data: Prisma.ProductCreateInput
-): Promise<PrismaModel> {
-  // If you need to transform or add default values, do it here.
-  // Example for Product data:
-  // const processedData = {
-  //   ...data,
-  //   slug: data.name.toLowerCase().replace(/\s+/g, '-'), // Example: generate slug from name
-  //   createdAt: new Date(),
-  // };
-  // return await prisma.product.create({ data: processedData });
-  return await prisma.product.create({ data });
-}
+  getProductById: async (id: string): Promise<Product | null> => {
+    try {
+      const product = await ProductRepository.findById(id);
+      if (!product) return null;
 
-/**
- * Creates multiple Product records.
- * @param data An array of data for the new Product records.
- * @returns A Prisma BatchPayload with the count of created records.
- */
-export async function createManyProducts(
-  data: Prisma.ProductCreateManyInput[]
-): Promise<Prisma.BatchPayload> {
-  return await prisma.product.createMany({ data });
-}
+      return convertPrismaProductToPOJO(product);
+    } catch (error) {
+      handleDalError(error, "getProductById");
+    }
+  },
 
-/**
- * Updates an existing Product record.
- * @param id The unique ID of the Product to update.
- * @param data The data to update the Product with. Define a specific interface if needed.
- * @returns The updated Product record.
- */
-export async function updateProduct(
-  id: string,
-  data: Prisma.ProductUpdateInput
-): Promise<PrismaModel> {
-  return await prisma.product.update({
-    where: { id },
-    data,
-  });
-}
+  getProductBySlug: async (slug: string): Promise<Product | null> => {
+    try {
+      const product = await ProductRepository.findBySlug(slug);
+      if (!product) return null;
 
-/**
- * Deletes a single Product record by its unique identifier.
- * @param id The unique ID of the Product to delete.
- * @returns The deleted Product record.
- */
-export async function deleteProduct(id: string): Promise<PrismaModel> {
-  return await prisma.product.delete({
-    where: { id },
-  });
-}
-
-/**
- * Deletes multiple Product records based on criteria.
- * This is often used in seeding or administrative tasks.
- * @param options Prisma deleteMany options (where).
- * @returns A Prisma BatchPayload with the count of deleted records.
- */
-export async function deleteManyProducts(
-  options?: Prisma.ProductDeleteManyArgs
-): Promise<Prisma.BatchPayload> {
-  return await prisma.product.deleteMany(options);
-}
+      return convertPrismaProductToPOJO(product);
+    } catch (error) {
+      handleDalError(error, "getProductBySlug");
+    }
+  },
+};

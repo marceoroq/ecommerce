@@ -1,10 +1,10 @@
 import { Product } from "@/types";
-import { getAllProducts } from "@/lib/data/product.dal";
+import { ProductService } from "@/lib/services/product.services";
 
 import ProductCard from "@/components/shared/product/product-card";
 
 const ProductList = async () => {
-  const productsList = await getAllProducts();
+  const productsList = await ProductService.getProducts();
 
   const limit = 4;
   const hasProducts = productsList.length > 0;
