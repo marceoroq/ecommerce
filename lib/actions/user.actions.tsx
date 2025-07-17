@@ -4,8 +4,7 @@ import { redirect } from "next/navigation";
 import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
 
-import { verifySession } from "@/lib/auth/verify-session";
-import { auth, signIn, signOut } from "@/lib/auth";
+import { signIn, signOut } from "@/lib/auth";
 import {
   paymentMethodSchema,
   shippingAddressSchema,
@@ -13,12 +12,7 @@ import {
   signUpFormSchema,
 } from "@/lib/validators";
 
-import {
-  createUser,
-  getUserByEmail,
-  getUserById,
-  updateUser,
-} from "@/lib/services/user.services";
+import { UserService } from "@/lib/services/user.services";
 
 import { PaymentMethod, ShippingAddress } from "@/types";
 
@@ -117,7 +111,7 @@ export async function signUpWithCredentials(
       password: userPassword,
     } = validatedFields.data;
 
-    const foundUser = await getUserByEmail(userEmail);
+    const foundUser = await UserService.getUserByEmail(userEmail);
 
     if (foundUser) {
       return {
@@ -126,7 +120,7 @@ export async function signUpWithCredentials(
       };
     }
 
-    await createUser({
+    await UserService.createUser({
       name: userName,
       email: userEmail,
       password: hashSync(userPassword, 10),
@@ -160,12 +154,9 @@ export async function signOutAction() {
 
 export async function updateUserAddressAction(data: ShippingAddress) {
   try {
-    const { userId } = await verifySession();
-    const currentUser = await getUserById(userId);
-    if (!currentUser) throw new Error("User not found");
-
     const validatedAddress = shippingAddressSchema.parse(data);
-    await updateUser(currentUser.id, { address: validatedAddress });
+
+    await UserService.updateUser({ address: validatedAddress });
 
     return { success: true, message: "User address updated successfully" };
   } catch (error) {
@@ -176,13 +167,8 @@ export async function updateUserAddressAction(data: ShippingAddress) {
 
 export async function updateUserPaymentMethodAction(data: PaymentMethod) {
   try {
-    const session = await auth();
-    const currentUser = await getUserById(session?.user.id || "");
-
-    if (!currentUser) throw new Error("User not found");
-
     const validatedMethod = paymentMethodSchema.parse(data);
-    await updateUser(currentUser.id, { paymentMethod: validatedMethod.type });
+    await UserService.updateUser({ paymentMethod: validatedMethod.type });
   } catch (error) {
     console.error(`[UPDATE PAYMENT METHOD ACTION ERROR]: ${error}`);
     return { success: false, message: error };

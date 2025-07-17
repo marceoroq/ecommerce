@@ -6,7 +6,7 @@ import { compareSync } from "bcryptjs";
 
 import prisma from "@/lib/prisma";
 import { authConfig } from "@/auth.config";
-import { getUserByEmail } from "@/lib/services/user.services";
+import { UserService } from "@/lib/services/user.services";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -28,7 +28,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if ((credentials.email as string).length === 0) return null;
 
-        const user = await getUserByEmail(credentials.email as string);
+        const user = await UserService.getUserByEmail(
+          credentials.email as string
+        );
+
         if (!user) return null;
 
         const isMatch = compareSync(

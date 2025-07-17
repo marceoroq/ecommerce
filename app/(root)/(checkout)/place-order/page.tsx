@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getUserById } from "@/lib/services/user.services";
+import { UserService } from "@/lib/services/user.services";
 import { verifySession } from "@/lib/auth/verify-session";
 import { getCurrentCart } from "@/lib/actions/cart.actions";
 
@@ -15,7 +15,7 @@ export default async function PlaceOrderPage() {
   const cart = await getCurrentCart();
   if (!cart || cart.items.length === 0) redirect("/cart");
 
-  const user = await getUserById(userId);
+  const user = await UserService.getUserById(userId);
   if (!user!.address) redirect("/shipping-address");
   if (!user!.paymentMethod) redirect("/payment-method");
 

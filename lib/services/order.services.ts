@@ -1,6 +1,11 @@
+import "server-only";
+
+import { UserService } from "@/lib/services/user.services";
 import { toPlainObject } from "@/lib/utils";
 import { verifySession } from "@/lib/auth/verify-session";
+import { getCurrentCart } from "@/lib/actions/cart.actions";
 import { OrderRepository } from "@/lib/data/order.repository";
+import { insertOrderSchema } from "@/lib/validators";
 import { handleRepositoryError } from "@/lib/data/error-handler";
 
 import { Order, OrderItem } from "@/types";
@@ -8,9 +13,6 @@ import {
   Order as PrismaOrder,
   OrderItem as PrismaOrderItem,
 } from "@/lib/generated/prisma";
-import { getUserById } from "./user.services";
-import { getCurrentCart } from "../actions/cart.actions";
-import { insertOrderSchema } from "../validators";
 
 function convertPrismaOrderItemToPOJO(
   orderItem: Omit<PrismaOrderItem, "orderId">
@@ -52,7 +54,7 @@ export const OrderService = {
 
   createOrder: async (): Promise<string> => {
     const { userId } = await verifySession();
-    const user = await getUserById(userId);
+    const user = await UserService.getUserById(userId);
 
     if (!user?.address) throw new Error("VALIDATION_CART_EMPTY");
     if (!user?.paymentMethod) throw new Error("VALIDATION_NO_PAYMENT_METHOD");
