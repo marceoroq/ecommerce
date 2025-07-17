@@ -19,34 +19,18 @@ export async function getProducts(
 }
 
 /**
- * Retrieves a single Product record by its unique identifier.
- * @param id The unique ID of the Product to retrieve.
- * @param options Prisma findUnique options (include, select, etc.)
- * @returns The Product record or null if not found.
- */
-export async function getProductById(
-  id: string,
-  options?: Prisma.ProductFindUniqueArgs
-): Promise<PrismaModel | null> {
-  return await prisma.product.findUnique({
-    where: { id },
-    ...options,
-  });
-}
-
-/**
  * Retrieves a single Product record by a unique field (e.g., slug, email).
  * @param fieldName The name of the unique field (e.g., 'slug', 'email').
  * @param value The value of the unique field.
  * @param options Prisma findUnique options (include, select, etc.)
  * @returns The Product record or null if not found.
  */
-export async function getProductBySlug(
-  value: string,
+export async function getProductBy(
+  where: Prisma.ProductWhereInput,
   options?: Prisma.ProductFindUniqueArgs
 ): Promise<PrismaModel | null> {
-  return await prisma.product.findUnique({
-    where: { slug: value },
+  return await prisma.product.findFirst({
+    where,
     ...options,
   });
 }

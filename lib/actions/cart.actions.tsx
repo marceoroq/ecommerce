@@ -3,16 +3,18 @@
 import zod from "zod";
 import { cookies } from "next/headers";
 
+import { auth } from "@/lib/auth";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
-import { verifySession } from "@/lib/auth/verify-session";
-import { getProductById } from "@/lib/services/product.services";
+
 import { convertPrismaCartToPOJO } from "@/lib/serializer/cart.serializer";
 import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
 import { createCart, getCart, updateCart } from "@/lib/services/cart.services";
 import { Cart, CartItem } from "@/types";
+import { getProductById } from "@/lib/data/product.dal";
 
 async function getUserAndSessionCartId() {
-  const { userId } = await verifySession();
+  const session = await auth();
+  const userId = session?.user?.id;
 
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
