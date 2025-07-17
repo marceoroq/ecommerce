@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
 import { getUserById } from "@/lib/services/user.services";
+import { verifySession } from "@/lib/auth/verify-session";
 import { getCurrentCart } from "@/lib/actions/cart.actions";
 
 import OrderPricingDetails from "@/components/shared/place-order/order-pricing-details";
@@ -10,10 +10,7 @@ import OrderSummary from "@/components/shared/place-order/order-summary";
 import { ShippingAddress } from "@/types";
 
 export default async function PlaceOrderPage() {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) throw new Error("No user ID");
+  const { userId } = await verifySession();
 
   const cart = await getCurrentCart();
   if (!cart || cart.items.length === 0) redirect("/cart");

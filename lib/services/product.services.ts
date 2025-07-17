@@ -1,3 +1,5 @@
+import "server-only";
+
 import prisma from "@/lib/prisma";
 import { Product as PrismaModel, Prisma } from "@/lib/generated/prisma";
 
@@ -10,10 +12,11 @@ import { Product as PrismaModel, Prisma } from "@/lib/generated/prisma";
  * @param options Prisma findMany options (where, orderBy, include, select, etc.)
  * @returns A list of Product records.
  */
-export async function getProducts(options?: Prisma.ProductFindManyArgs): Promise<PrismaModel[]> {
+export async function getProducts(
+  options?: Prisma.ProductFindManyArgs
+): Promise<PrismaModel[]> {
   return await prisma.product.findMany(options);
 }
-
 
 /**
  * Retrieves a single Product record by its unique identifier.
@@ -21,7 +24,10 @@ export async function getProducts(options?: Prisma.ProductFindManyArgs): Promise
  * @param options Prisma findUnique options (include, select, etc.)
  * @returns The Product record or null if not found.
  */
-export async function getProductById(id: string, options?: Prisma.ProductFindUniqueArgs): Promise<PrismaModel | null> {
+export async function getProductById(
+  id: string,
+  options?: Prisma.ProductFindUniqueArgs
+): Promise<PrismaModel | null> {
   return await prisma.product.findUnique({
     where: { id },
     ...options,
@@ -35,7 +41,10 @@ export async function getProductById(id: string, options?: Prisma.ProductFindUni
  * @param options Prisma findUnique options (include, select, etc.)
  * @returns The Product record or null if not found.
  */
-export async function getProductBySlug(value: string, options?: Prisma.ProductFindUniqueArgs): Promise<PrismaModel | null> {
+export async function getProductBySlug(
+  value: string,
+  options?: Prisma.ProductFindUniqueArgs
+): Promise<PrismaModel | null> {
   return await prisma.product.findUnique({
     where: { slug: value },
     ...options,
@@ -52,7 +61,9 @@ export async function getProductBySlug(value: string, options?: Prisma.ProductFi
  * Example: { name: string, description: string, price: number }
  * @returns The newly created Product record.
  */
-export async function createProduct(data: Prisma.ProductCreateInput): Promise<PrismaModel> {
+export async function createProduct(
+  data: Prisma.ProductCreateInput
+): Promise<PrismaModel> {
   // If you need to transform or add default values, do it here.
   // Example for Product data:
   // const processedData = {
@@ -69,7 +80,9 @@ export async function createProduct(data: Prisma.ProductCreateInput): Promise<Pr
  * @param data An array of data for the new Product records.
  * @returns A Prisma BatchPayload with the count of created records.
  */
-export async function createManyProducts(data: Prisma.ProductCreateManyInput[]): Promise<Prisma.BatchPayload> {
+export async function createManyProducts(
+  data: Prisma.ProductCreateManyInput[]
+): Promise<Prisma.BatchPayload> {
   return await prisma.product.createMany({ data });
 }
 
@@ -79,7 +92,10 @@ export async function createManyProducts(data: Prisma.ProductCreateManyInput[]):
  * @param data The data to update the Product with. Define a specific interface if needed.
  * @returns The updated Product record.
  */
-export async function updateProduct(id: string, data: Prisma.ProductUpdateInput): Promise<PrismaModel> {
+export async function updateProduct(
+  id: string,
+  data: Prisma.ProductUpdateInput
+): Promise<PrismaModel> {
   return await prisma.product.update({
     where: { id },
     data,
@@ -103,6 +119,8 @@ export async function deleteProduct(id: string): Promise<PrismaModel> {
  * @param options Prisma deleteMany options (where).
  * @returns A Prisma BatchPayload with the count of deleted records.
  */
-export async function deleteManyProducts(options?: Prisma.ProductDeleteManyArgs): Promise<Prisma.BatchPayload> {
+export async function deleteManyProducts(
+  options?: Prisma.ProductDeleteManyArgs
+): Promise<Prisma.BatchPayload> {
   return await prisma.product.deleteMany(options);
 }

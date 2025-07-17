@@ -6,8 +6,10 @@ import {
   convertPrismaProductsToPOJO,
   convertPrismaProductToPOJO,
 } from "@/lib/serializer/product.serializer";
+import { delay } from "../utils";
 
 export async function getProductsAction(): Promise<Product[]> {
+  await delay(2000);
   try {
     const products = await getProducts();
     return convertPrismaProductsToPOJO(products);

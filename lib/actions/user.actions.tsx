@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
 
+import { verifySession } from "@/lib/auth/verify-session";
 import { auth, signIn, signOut } from "@/lib/auth";
 import {
   paymentMethodSchema,
@@ -159,8 +160,8 @@ export async function signOutAction() {
 
 export async function updateUserAddressAction(data: ShippingAddress) {
   try {
-    const session = await auth();
-    const currentUser = await getUserById(session?.user.id || "");
+    const { userId } = await verifySession();
+    const currentUser = await getUserById(userId);
     if (!currentUser) throw new Error("User not found");
 
     const validatedAddress = shippingAddressSchema.parse(data);

@@ -1,22 +1,17 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { Order } from "@/lib/generated/prisma";
 import { getUserById } from "@/lib/services/user.services";
+import { verifySession } from "@/lib/auth/verify-session";
 import { getCurrentCart } from "@/lib/actions/cart.actions";
 import { insertOrderSchema } from "@/lib/validators";
 import { createOrder, getOrderById } from "@/lib/services/order.services";
 
 export async function createOrderAction() {
   try {
-    const session = await auth();
-    if (!session) throw new Error("User is not authenticated");
-
-    const userId = session?.user?.id;
-    if (!userId) throw new Error("User not found");
-
-    const cart = await getCurrentCart();
+    const { userId } = await verifySession();
     const user = await getUserById(userId);
+    const cart = await getCurrentCart();
 
     if (!cart || cart.items.length === 0) {
       return {

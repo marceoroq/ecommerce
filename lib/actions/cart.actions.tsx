@@ -3,8 +3,8 @@
 import zod from "zod";
 import { cookies } from "next/headers";
 
-import { auth } from "@/lib/auth";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
+import { verifySession } from "@/lib/auth/verify-session";
 import { getProductById } from "@/lib/services/product.services";
 import { convertPrismaCartToPOJO } from "@/lib/serializer/cart.serializer";
 import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
@@ -12,8 +12,7 @@ import { createCart, getCart, updateCart } from "@/lib/services/cart.services";
 import { Cart, CartItem } from "@/types";
 
 async function getUserAndSessionCartId() {
-  const session = await auth();
-  const userId = session?.user.id;
+  const { userId } = await verifySession();
 
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
 
