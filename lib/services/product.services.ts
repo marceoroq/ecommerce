@@ -2,9 +2,9 @@ import "server-only";
 
 import { Product } from "@/types";
 import { toPlainObject } from "@/lib/utils";
-import { handleDalError } from "@/lib/data/error-handler";
-import { Product as PrismaProduct } from "@/lib/generated/prisma";
 import { ProductRepository } from "@/lib/data/product.repository";
+import { handleRepositoryError } from "@/lib/data/error-handler";
+import { Product as PrismaProduct } from "@/lib/generated/prisma";
 
 function convertPrismaProductToPOJO(product: PrismaProduct): Product {
   return {
@@ -21,7 +21,7 @@ export const ProductService = {
 
       return products.map((product) => convertPrismaProductToPOJO(product));
     } catch (error) {
-      handleDalError(error, "getAllProducts");
+      handleRepositoryError(error, "getAllProducts");
     }
   },
 
@@ -32,7 +32,7 @@ export const ProductService = {
 
       return convertPrismaProductToPOJO(product);
     } catch (error) {
-      handleDalError(error, "getProductById");
+      handleRepositoryError(error, "getProductById");
     }
   },
 
@@ -43,7 +43,7 @@ export const ProductService = {
 
       return convertPrismaProductToPOJO(product);
     } catch (error) {
-      handleDalError(error, "getProductBySlug");
+      handleRepositoryError(error, "getProductBySlug");
     }
   },
 };
