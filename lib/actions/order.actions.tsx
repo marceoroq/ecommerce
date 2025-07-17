@@ -1,93 +1,51 @@
 "use server";
 
-import { Order } from "@/lib/generated/prisma";
-import { getUserById } from "@/lib/services/user.services";
-import { verifySession } from "@/lib/auth/verify-session";
-import { getCurrentCart } from "@/lib/actions/cart.actions";
-import { insertOrderSchema } from "@/lib/validators";
-import { createOrder, getOrderById } from "@/lib/services/order.services";
+import { OrderService } from "@/lib/services/order.services";
 
 export async function createOrderAction() {
   try {
-    const { userId } = await verifySession();
-    const user = await getUserById(userId);
-    const cart = await getCurrentCart();
-
-    if (!cart || cart.items.length === 0) {
-      return {
-        success: false,
-        message: "Your cart is empty",
-        redirectTo: "/cart",
-      };
-    }
-
-    if (!user?.address) {
-      return {
-        success: false,
-        message: "No shipping address",
-        redirectTo: "/shipping-address",
-      };
-    }
-
-    if (!user?.paymentMethod) {
-      return {
-        success: false,
-        message: "No payment method",
-        redirectTo: "/payment-method",
-      };
-    }
-
-    const itemsPrice = (
-      cart.items.reduce((acc, item) => {
-        return acc + Number(item.price) * item.quantity;
-      }, 0) || 0
-    ).toFixed(2);
-
-    const totalPrice = (
-      Number(itemsPrice) +
-      Number(cart.shippingPrice) +
-      Number(cart.taxPrice)
-    ).toFixed(2);
-
-    // Create order object
-    const order = insertOrderSchema.parse({
-      userId: user.id,
-      shippingAddress: user.address,
-      paymentMethod: user.paymentMethod,
-      itemsPrice,
-      shippingPrice: cart.shippingPrice,
-      taxPrice: cart.taxPrice,
-      totalPrice,
-      items: cart.items,
-    });
-
-    // Create a transaction to create order and order items
-    const createdOrderId = await createOrder(order, cart.id);
-
-    if (!createdOrderId) throw new Error("Order not created");
+    const orderId = await OrderService.createOrder();
 
     return {
       success: true,
-      message: "Order created successfully",
-      redirectTo: `/order/${createdOrderId}`,
+      message: "Order created",
+      redirectTo: `/order/${orderId}`,
     };
   } catch (error) {
-    console.error("[Create Order Action Error]:", error);
-    return { success: false, message: String(error) };
-  }
-}
+    type ErrorMapping = {
+      message: string;
+      redirectTo: string;
+    };
 
-export async function getOrderByIdAction(id: string): Promise<Order | null> {
-  try {
-    const order = await getOrderById(id, {
-      include: {
-        OrderItem: true,
-        user: { select: { name: true, email: true } },
+    const ERROR_MAPPINGS: Record<string, ErrorMapping> = {
+      VALIDATION_CART_EMPTY: {
+        message: "Your cart is empty",
+        redirectTo: "/cart",
       },
-    });
-    return order;
-  } catch (error) {
-    console.error("[Get Order by ID Action Error]:", error);
-    return null;
+      VALIDATION_NO_ADDRESS: {
+        message: "Shipping address required",
+        redirectTo: "/shipping-address",
+      },
+      VALIDATION_NO_PAYMENT_METHOD: {
+        message: "Payment method required",
+        redirectTo: "/payment-method",
+      },
+    };
+
+    const DEFAULT_ERROR: ErrorMapping = {
+      message: "Failed to process request",
+      redirectTo: "/cart",
+    };
+
+    const errorCode = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+    console.error("[Order Action]", errorCode);
+
+    const { message, redirectTo } = ERROR_MAPPINGS[errorCode] || DEFAULT_ERROR;
+
+    return {
+      success: false,
+      message,
+      redirectTo,
+    };
   }
 }

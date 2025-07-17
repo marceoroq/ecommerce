@@ -1,137 +1,93 @@
-import prisma from "@/lib/prisma";
-import { Order as PrismaModel, Prisma } from "@/lib/generated/prisma";
-import { OrderItem } from "@/types";
+import { toPlainObject } from "@/lib/utils";
+import { verifySession } from "@/lib/auth/verify-session";
+import { OrderRepository } from "@/lib/data/order.repository";
+import { handleRepositoryError } from "@/lib/data/error-handler";
 
-// ===========================================================
-// READ OPERATIONS
-// ===========================================================
+import { Order, OrderItem } from "@/types";
+import {
+  Order as PrismaOrder,
+  OrderItem as PrismaOrderItem,
+} from "@/lib/generated/prisma";
+import { getUserById } from "./user.services";
+import { getCurrentCart } from "../actions/cart.actions";
+import { insertOrderSchema } from "../validators";
 
-/**
- * Retrieves multiple Order records from the database.
- * @param options Prisma findMany options (where, orderBy, include, select, etc.)
- * @returns A list of Order records.
- */
-export async function getOrders(
-  options?: Prisma.OrderFindManyArgs
-): Promise<PrismaModel[]> {
-  return await prisma.order.findMany(options);
+function convertPrismaOrderItemToPOJO(
+  orderItem: Omit<PrismaOrderItem, "orderId">
+): OrderItem {
+  return {
+    ...toPlainObject(orderItem),
+    price: orderItem.price.toFixed(2),
+  };
 }
 
-/*
-/**
- * Retrieves a single Order record by its unique identifier.
- * @param id The unique ID of the Order to retrieve.
- * @param options Prisma findUnique options (include, select, etc.)
- * @returns The Order record or null if not found.
- */
-export async function getOrderById(
-  id: string,
-  options?: Prisma.OrderFindFirstArgs
-): Promise<PrismaModel | null> {
-  return await prisma.order.findFirst({
-    where: { id },
-    ...options,
-  });
+function convertPrismaOrderToPOJO(
+  order: PrismaOrder & { OrderItem: PrismaOrderItem[] }
+): Order {
+  const { OrderItem, ...restOrder } = order;
+  return {
+    ...toPlainObject(restOrder),
+    taxPrice: order.taxPrice.toFixed(2),
+    totalPrice: order.totalPrice.toFixed(2),
+    itemsPrice: order.itemsPrice.toFixed(2),
+    shippingPrice: order.shippingPrice.toFixed(2),
+    items: OrderItem.map(convertPrismaOrderItemToPOJO),
+    paypalResult: JSON.parse(JSON.stringify(order.paypalResult)),
+    shippingAddress: JSON.parse(JSON.stringify(order.shippingAddress)),
+  };
 }
 
-// ===========================================================
-// WRITE OPERATIONS
-// ===========================================================
+export const OrderService = {
+  getOrderById: async (id: string): Promise<Order | null> => {
+    try {
+      const order = await OrderRepository.findByIdWithDetails(id);
 
-/**
- * Creates a new Order record.
- * @param data The data for the new Order. Define a specific interface for clarity.
- * Example: { name: string, description: string, price: number }
- * @returns The newly created Order record.
- */
-export async function createOrder(
-  data: Omit<Prisma.OrderCreateInput, "user"> & {
-    userId: string;
-    items: OrderItem[];
+      if (!order) return null;
+
+      return convertPrismaOrderToPOJO(order);
+    } catch (error) {
+      handleRepositoryError(error, "getProductById");
+    }
   },
-  cartId: string
-): Promise<string> {
-  const { userId, items, ...orderData } = data;
 
-  return await prisma.$transaction(async (tx) => {
-    // First create order
-    const createdOrder = await tx.order.create({
-      data: {
-        ...orderData,
-        // use connect because the order has relation with user
-        // in prisma
-        user: { connect: { id: userId } },
-      },
+  createOrder: async (): Promise<string> => {
+    const { userId } = await verifySession();
+    const user = await getUserById(userId);
+
+    if (!user?.address) throw new Error("VALIDATION_CART_EMPTY");
+    if (!user?.paymentMethod) throw new Error("VALIDATION_NO_PAYMENT_METHOD");
+
+    const cart = await getCurrentCart();
+    if (!cart || cart.items.length === 0)
+      throw new Error("VALIDATION_CART_EMPTY");
+
+    const itemsPrice = (
+      cart.items.reduce((acc, item) => {
+        return acc + Number(item.price) * item.quantity;
+      }, 0) || 0
+    ).toFixed(2);
+
+    const totalPrice = (
+      Number(itemsPrice) +
+      Number(cart.shippingPrice) +
+      Number(cart.taxPrice)
+    ).toFixed(2);
+
+    // Create order object
+    const order = insertOrderSchema.parse({
+      userId: user.id,
+      shippingAddress: user.address,
+      paymentMethod: user.paymentMethod,
+      itemsPrice,
+      shippingPrice: cart.shippingPrice,
+      taxPrice: cart.taxPrice,
+      totalPrice,
+      items: cart.items,
     });
 
-    // Then create order items from the cart items
-    await tx.orderItem.createMany({
-      data: items.map((item) => ({
-        ...item,
-        orderId: createdOrder.id,
-      })),
-    });
+    const createdOrderId = await OrderRepository.create(order, cart.id);
+    if (!createdOrderId) throw new Error("ORDER_NOT_CREATED");
 
-    // Clear cart
-    await tx.cart.update({
-      where: { id: cartId },
-      data: {
-        items: [],
-        shippingPrice: 0,
-        taxPrice: 0,
-      },
-    });
-
-    return createdOrder.id;
-  });
-}
-
-/**
- * Creates multiple Order records.
- * @param data An array of data for the new Order records.
- * @returns A Prisma BatchPayload with the count of created records.
- */
-export async function createManyOrders(
-  data: Prisma.OrderCreateManyInput[]
-): Promise<Prisma.BatchPayload> {
-  return await prisma.order.createMany({ data });
-}
-
-/**
- * Updates an existing Order record.
- * @param id The unique ID of the Order to update.
- * @param data The data to update the Order with. Define a specific interface if needed.
- * @returns The updated Order record.
- */
-export async function updateOrder(
-  id: string,
-  data: Prisma.OrderUpdateInput
-): Promise<PrismaModel> {
-  return await prisma.order.update({
-    where: { id },
-    data,
-  });
-}
-
-/**
- * Deletes a single Order record by its unique identifier.
- * @param id The unique ID of the Order to delete.
- * @returns The deleted Order record.
- */
-export async function deleteOrder(id: string): Promise<PrismaModel> {
-  return await prisma.order.delete({
-    where: { id },
-  });
-}
-
-/**
- * Deletes multiple Order records based on criteria.
- * This is often used in seeding or administrative tasks.
- * @param options Prisma deleteMany options (where).
- * @returns A Prisma BatchPayload with the count of deleted records.
- */
-export async function deleteManyOrders(
-  options?: Prisma.OrderDeleteManyArgs
-): Promise<Prisma.BatchPayload> {
-  return await prisma.order.deleteMany(options);
-}
+    return createdOrderId;
+  },
+};
