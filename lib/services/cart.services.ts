@@ -1,121 +1,80 @@
+import "server-only";
+
 import prisma from "@/lib/prisma";
 import { Cart as PrismaModel, Prisma } from "@/lib/generated/prisma";
+import { Cart } from "@/types";
+import { toPlainObject } from "@/lib/utils";
+import { CartRepository } from "../data/cart.repository";
+import { UserService } from "./user.services";
+import { cache } from "react";
 
-// ===========================================================
-// READ OPERATIONS
-// ===========================================================
-
-/**
- * Retrieves multiple Cart records from the database.
- * @param options Prisma findMany options (where, orderBy, include, select, etc.)
- * @returns A list of Cart records.
- */
-export async function getCarts(
-  options?: Prisma.CartFindManyArgs
-): Promise<PrismaModel[]> {
-  return await prisma.cart.findMany(options);
+export function convertPrismaCartToPOJO(prismaCart: PrismaModel): Cart {
+  return {
+    ...toPlainObject(prismaCart),
+    shippingPrice: prismaCart.shippingPrice.toFixed(2).toString(),
+    taxPrice: prismaCart.taxPrice.toFixed(2).toString(),
+    items: JSON.parse(JSON.stringify(prismaCart.items)),
+  };
 }
 
-/**
- * Retrieves a single Cart record by a unique identifier.
- * @param where A Prisma `CartWhereUniqueInput` object specifying the unique field and its value.
- * @param options Optional Prisma `CartFindUniqueArgs` for including related data or selecting specific fields.
- * @returns The Cart record or null if not found.
- */
-export async function getCart(
-  where: Prisma.CartWhereInput,
-  options?: Omit<Prisma.CartFindFirstArgs, "where"> // Omit 'where' as it's passed separately
-): Promise<PrismaModel | null> {
-  return await prisma.cart.findFirst({ where, ...options });
-}
+const getCurrentCart = cache(async (sessionCartId = "") => {
+  const currentUserId = await UserService.getAuthenticatedUserId();
 
-/*
-/**
- * Retrieves a single Cart record by its unique identifier.
- * @param id The unique ID of the Cart to retrieve.
- * @param options Prisma findUnique options (include, select, etc.)
- * @returns The Cart record or null if not found.
- */
-export async function getCartById(
-  id: string,
-  options?: Prisma.CartFindUniqueArgs
-): Promise<PrismaModel | null> {
-  return await prisma.cart.findUnique({
-    where: { id },
-    ...options,
-  });
-}
+  if (!currentUserId && !sessionCartId) return null;
 
-// ===========================================================
-// WRITE OPERATIONS
-// ===========================================================
+  const prismaCart = currentUserId
+    ? await CartRepository.findByUserId(currentUserId)
+    : await CartRepository.findBySessionCartId(sessionCartId);
 
-/**
- * Creates a new Cart record.
- * @param data The data for the new Cart. Define a specific interface for clarity.
- * Example: { name: string, description: string, price: number }
- * @returns The newly created Cart record.
- */
-export async function createCart(
-  data: Prisma.CartCreateInput
-): Promise<PrismaModel> {
-  // If you need to transform or add default values, do it here.
-  // Example for Product data:
-  // const processedData = {
-  //   ...data,
-  //   slug: data.name.toLowerCase().replace(/\s+/g, '-'), // Example: generate slug from name
-  //   createdAt: new Date(),
-  // };
-  // return await prisma.cart.create({ data: processedData });
-  return await prisma.cart.create({ data });
-}
+  if (!prismaCart) return null;
 
-/**
- * Creates multiple Cart records.
- * @param data An array of data for the new Cart records.
- * @returns A Prisma BatchPayload with the count of created records.
- */
-export async function createManyCarts(
-  data: Prisma.CartCreateManyInput[]
-): Promise<Prisma.BatchPayload> {
-  return await prisma.cart.createMany({ data });
-}
+  return convertPrismaCartToPOJO(prismaCart);
+});
 
-/**
- * Updates an existing Cart record.
- * @param id The unique ID of the Cart to update.
- * @param data The data to update the Cart with. Define a specific interface if needed.
- * @returns The updated Cart record.
- */
-export async function updateCart(
-  id: string,
-  data: Prisma.CartUpdateInput
-): Promise<PrismaModel> {
-  return await prisma.cart.update({
-    where: { id },
-    data,
-  });
-}
+export const CartService = {
+  getCurrentCart,
 
-/**
- * Deletes a single Cart record by its unique identifier.
- * @param id The unique ID of the Cart to delete.
- * @returns The deleted Cart record.
- */
-export async function deleteCart(id: string): Promise<PrismaModel> {
-  return await prisma.cart.delete({
-    where: { id },
-  });
-}
+  getCartById: async (id: string): Promise<PrismaModel | null> =>
+    await CartRepository.findById(id),
 
-/**
- * Deletes multiple Cart records based on criteria.
- * This is often used in seeding or administrative tasks.
- * @param options Prisma deleteMany options (where).
- * @returns A Prisma BatchPayload with the count of deleted records.
- */
-export async function deleteManyCarts(
-  options?: Prisma.CartDeleteManyArgs
-): Promise<Prisma.BatchPayload> {
-  return await prisma.cart.deleteMany(options);
-}
+  getCartByUserId: async (userId: string): Promise<PrismaModel | null> =>
+    await CartRepository.findByUserId(userId),
+
+  getCartBySessionCartId: async (
+    sessionCartId: string
+  ): Promise<PrismaModel | null> =>
+    await CartRepository.findBySessionCartId(sessionCartId),
+
+  getCartItemQuantity: async (
+    productId: string,
+    sessionCartId?: string
+  ): Promise<number> => {
+    const cart = await getCurrentCart(sessionCartId);
+    return (
+      cart?.items.find((item) => item.productId === productId)?.quantity || 0
+    );
+  },
+
+  hasCartItems: async (sessionCartId?: string): Promise<boolean> => {
+    const cart = await getCurrentCart(sessionCartId);
+    return Boolean(cart?.items.length);
+  },
+
+  createCart: async (data: Prisma.CartCreateInput): Promise<PrismaModel> => {
+    const currentUserId = await UserService.getAuthenticatedUserId();
+
+    return await CartRepository.create({
+      ...data,
+      user: currentUserId ? { connect: { id: currentUserId } } : {},
+    });
+  },
+
+  updateCart: async (
+    id: string,
+    data: Prisma.CartUpdateInput
+  ): Promise<PrismaModel> =>
+    await prisma.cart.update({
+      where: { id },
+      data,
+    }),
+};

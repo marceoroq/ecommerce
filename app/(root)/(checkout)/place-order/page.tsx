@@ -1,8 +1,9 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { UserService } from "@/lib/services/user.services";
+import { CartService } from "@/lib/services/cart.services";
 import { verifySession } from "@/lib/auth/verify-session";
-import { getCurrentCart } from "@/lib/actions/cart.actions";
 
 import OrderPricingDetails from "@/components/shared/place-order/order-pricing-details";
 import OrderSummary from "@/components/shared/place-order/order-summary";
@@ -12,7 +13,8 @@ import { ShippingAddress } from "@/types";
 export default async function PlaceOrderPage() {
   const { userId } = await verifySession();
 
-  const cart = await getCurrentCart();
+  const sesionCartId = (await cookies()).get("sessionCartId")?.value;
+  const cart = await CartService.getCurrentCart(sesionCartId);
   if (!cart || cart.items.length === 0) redirect("/cart");
 
   const user = await UserService.getUserById(userId);

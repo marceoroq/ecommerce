@@ -1,12 +1,18 @@
 import "server-only";
 
 import { User as PrismaModel, Prisma } from "@/lib/generated/prisma";
+import { UserRepository } from "@/lib/data/user.repository";
 import { verifySession } from "@/lib/auth/verify-session";
-import { UserRepository } from "../data/user.repository";
+import { auth } from "@/lib/auth";
 
 export const UserService = {
+  getAuthenticatedUserId: async (): Promise<string | undefined> => {
+    const session = await auth();
+    return session?.user?.id;
+  },
+
   getUserById: async (id: string): Promise<PrismaModel | null> => {
-    return await UserRepository.findByEmail(id);
+    return await UserRepository.findById(id);
   },
 
   getUserByEmail: async (email: string): Promise<PrismaModel | null> => {

@@ -1,12 +1,13 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { ProductService } from "@/lib/services/product.services";
-import { getCartItemQuantity } from "@/lib/actions/cart.actions";
 
 import { Badge } from "@/components/ui/badge";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import ProductImages from "@/components/shared/product/product-images";
 import { Card, CardContent } from "@/components/ui/card";
+import { CartService } from "@/lib/services/cart.services";
 
 interface ProductDetailsPageProps {
   params: Promise<{ slug: string }>;
@@ -22,7 +23,11 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
-  const cartItemQuantity = await getCartItemQuantity(product.id);
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+  const cartItemQuantity = await CartService.getCartItemQuantity(
+    product.id,
+    sessionCartId
+  );
 
   const hasStock = product.stock > 0;
 

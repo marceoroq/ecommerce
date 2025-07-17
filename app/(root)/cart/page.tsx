@@ -1,20 +1,18 @@
+import { cookies } from "next/headers";
+
 import { cn } from "@/lib/utils";
+import { CartService } from "@/lib/services/cart.services";
 
-import { getCurrentCart } from "@/lib/actions/cart.actions";
-
-import CartDetails from "@/components/shared/cart/cart-details";
 import CartTable from "@/components/shared/cart/cart-table";
+import CartDetails from "@/components/shared/cart/cart-details";
 
 export const metadata = {
   title: "Shopping Cart",
 };
 
-// Force dynamic rendering because this page uses getCurrentCart() which depends on cookies().
-// NextJS cannot statically analyze this dependency, so we explicitly mark it as dynamic.
-export const dynamic = "force-dynamic";
-
 export default async function CartPage() {
-  const cart = await getCurrentCart();
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+  const cart = await CartService.getCurrentCart(sessionCartId);
   const showEmptyState = !cart || cart.items.length === 0;
 
   const subTotal =

@@ -3,43 +3,27 @@
 import zod from "zod";
 import { cookies } from "next/headers";
 
-import { auth } from "@/lib/auth";
 import { Decimal } from "@/lib/generated/prisma/runtime/library";
-
+import { CartService } from "@/lib/services/cart.services";
 import { ProductService } from "@/lib/services/product.services";
-import { convertPrismaCartToPOJO } from "@/lib/serializer/cart.serializer";
+
 import { insertCartItemSchema, insertCartSchema } from "@/lib/validators";
-import { createCart, getCart, updateCart } from "@/lib/services/cart.services";
 import { Cart, CartItem } from "@/types";
 
-async function getUserAndSessionCartId() {
-  const session = await auth();
-  const userId = session?.user?.id;
-
+async function getCurrentCart(): Promise<Cart | null> {
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
-
-  if (!sessionCartId) {
-    throw new Error("Session Cart ID not found");
-  }
-
-  return [userId, sessionCartId];
+  return await CartService.getCurrentCart(sessionCartId);
 }
 
 export async function manageCartItemAdditionAction(itemData: CartItem) {
   try {
     const productInDB = await ProductService.getProductById(itemData.productId);
-
-    if (!productInDB) {
-      return { success: false, message: "Product not found" };
-    }
+    if (!productInDB) throw new Error("PRODUCT_NOT_FOUND");
 
     // Prepare and validate cart item data to be added to the cart.
     const validatedItem = insertCartItemSchema.parse(itemData);
 
-    // Get userId and sessionCartId to find cart in DB.
-    const [userId, sessionCartId] = await getUserAndSessionCartId();
-
-    // Get cart with userId or sessionCartId.
+    // Get cart with userId or sessionCartId if exist
     const cart = await getCurrentCart();
 
     // Create a variable to save the message to send in response.
@@ -47,6 +31,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
 
     // If the cart doesn't exist, we'll create it with the product to be added.
     if (!cart) {
+      const sessionCartId = (await cookies()).get("sessionCartId")?.value;
       const shippingPrice = "10.00";
       const taxPrice = new Decimal(validatedItem.price)
         .mul(new Decimal(0.21))
@@ -54,56 +39,49 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
         .toString();
 
       const validatedFields = insertCartSchema.parse({
-        userId,
         shippingPrice,
         taxPrice,
         sessionCartId,
         items: [validatedItem],
       });
 
-      await createCart(validatedFields);
+      await CartService.createCart(validatedFields);
     } else {
-      // Verify if the product exist in the cart
+      // If cart exist, verify if the product is in and get it
       const productInCart = cart.items.find(
         (item) => item.productId === validatedItem.productId
       );
 
-      if (productInCart) {
-        // Checks if the quantity to add exceeds the available stock
-        if (
-          productInDB.stock <
-          productInCart.quantity + validatedItem.quantity
-        ) {
-          throw new Error("Not enough stock");
-        }
+      // Checks if the quantity to add exceeds the available stock
+      const newItemQuantity =
+        (productInCart?.quantity || 0) + validatedItem.quantity;
 
+      const hasEnoughStock = productInDB.stock >= newItemQuantity;
+      if (!hasEnoughStock) throw new Error("PRODUCT_EXCEED_STOCK");
+
+      if (productInCart) {
         // The product is in the cart, we'll update its quantity.
         const updatedItems = cart.items.map((item) =>
           item.productId === validatedItem.productId
-            ? { ...item, quantity: item.quantity + validatedItem.quantity }
+            ? { ...item, quantity: newItemQuantity }
             : item
         );
 
-        await updateCart(cart.id, {
+        await CartService.updateCart(cart.id, {
           items: updatedItems,
         });
 
         message = "Cart quantity updated for product.";
       } else {
         // If the product isn't in the cart, we'll add it.
-        await updateCart(cart.id, {
+        await CartService.updateCart(cart.id, {
           items: [...cart.items, validatedItem],
         });
       }
     }
 
-    // TODO: analize when will be neccessary
-    // revalidatePath(`/product/${productInDB.slug}`);
-
     return { success: true, message };
   } catch (error) {
-    console.error("[manageCartItemAdditionAction Error]:", error);
-
     if (error instanceof zod.ZodError) {
       return {
         success: false,
@@ -112,7 +90,32 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
       };
     }
 
-    return { success: false, message: String(error) };
+    type ErrorMapping = {
+      message: string;
+    };
+
+    const ERROR_MAPPINGS: Record<string, ErrorMapping> = {
+      PRODUCT_NOT_FOUND: {
+        message: "The product was not found",
+      },
+      PRODUCT_EXCEED_STOCK: {
+        message: "Product not enough stock",
+      },
+    };
+
+    const DEFAULT_ERROR: ErrorMapping = {
+      message: "Failed to process request",
+    };
+
+    const errorCode = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+    console.error("[Cart Action]", errorCode);
+
+    const { message } = ERROR_MAPPINGS[errorCode] || DEFAULT_ERROR;
+
+    return {
+      success: false,
+      message,
+    };
   }
 }
 
@@ -121,7 +124,6 @@ export async function decreaseCartItemQuantityAction(
   quantityToRemove: number
 ) {
   try {
-    // Get current cart
     const cart = await getCurrentCart();
 
     if (!cart) {
@@ -141,7 +143,7 @@ export async function decreaseCartItemQuantityAction(
         (item) => item.productId !== productId
       );
 
-      await updateCart(cart.id, {
+      await CartService.updateCart(cart.id, {
         items: updatedItems,
       });
     } else {
@@ -152,7 +154,7 @@ export async function decreaseCartItemQuantityAction(
           : item
       );
 
-      await updateCart(cart.id, {
+      await CartService.updateCart(cart.id, {
         items: updatedItems,
       });
 
@@ -178,7 +180,7 @@ export async function removeProductFromCartAction(productId: string) {
       (item) => item.productId !== productId
     );
 
-    await updateCart(cart.id, {
+    await CartService.updateCart(cart.id, {
       items: updatedItems,
     });
 
@@ -187,44 +189,5 @@ export async function removeProductFromCartAction(productId: string) {
     console.error("[removeProductFromCartAction Error]:", error);
 
     return { success: false, message: String(error) };
-  }
-}
-
-export async function getCurrentCart(): Promise<Cart | null> {
-  try {
-    const [userId, sessionCartId] = await getUserAndSessionCartId();
-
-    const cart = await getCart(userId ? { userId } : { sessionCartId });
-
-    if (!cart) return null;
-
-    return convertPrismaCartToPOJO(cart);
-  } catch (error) {
-    console.error("Error trying to get current cart", error);
-    throw new Error(`Error trying to get current cart: ${error}`);
-  }
-}
-
-export async function getCartItemQuantity(productId: string): Promise<number> {
-  try {
-    const cart = await getCurrentCart();
-
-    return (
-      cart?.items.find((item) => item.productId === productId)?.quantity || 0
-    );
-  } catch (error) {
-    console.error("Error fetching cart item quantity:", error);
-    throw error;
-  }
-}
-
-export async function hasCartItems(): Promise<boolean> {
-  try {
-    const cart = await getCurrentCart();
-
-    return Boolean(cart?.items.length);
-  } catch (error) {
-    console.error("Error getting if cart has items:", error);
-    throw error;
   }
 }

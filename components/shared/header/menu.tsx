@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { PanelRightOpen, ShoppingBag } from "lucide-react";
 
-import { hasCartItems as hasCartItemsService } from "@/lib/actions/cart.actions";
-
 import CartBadge from "@/components/shared/header/cart-badge";
 import UserButton from "@/components/shared/header/user-button";
 import ModeToggle from "@/components/shared/header/mode-toggle";
@@ -14,9 +12,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { CartService } from "@/lib/services/cart.services";
+import { cookies } from "next/headers";
 
 const Menu = async () => {
-  const hasCartItems = await hasCartItemsService();
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+  const hasCartItems = await CartService.hasCartItems(sessionCartId);
 
   return (
     <div className="flex justify-end gap-3">

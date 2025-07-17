@@ -2,12 +2,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { hasCartItems } from "@/lib/actions/cart.actions";
+import { usePathname, useRouter } from "next/navigation";
+
 import { Badge } from "@/components/ui/badge";
 
 const CartBadge = ({ hasItems: initialHasItems }: { hasItems: boolean }) => {
   const [hasItems, setHasItems] = useState(initialHasItems);
+  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -15,12 +16,8 @@ const CartBadge = ({ hasItems: initialHasItems }: { hasItems: boolean }) => {
   }, [initialHasItems]);
 
   useEffect(() => {
-    const checkCart = async () => {
-      const hasItems = await hasCartItems();
-      setHasItems(hasItems);
-    };
-    checkCart();
-  }, [pathname]);
+    router.refresh();
+  }, [pathname, router]);
 
   if (!hasItems) return null;
 

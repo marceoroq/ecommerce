@@ -1,9 +1,9 @@
 import "server-only";
 
 import { UserService } from "@/lib/services/user.services";
+import { CartService } from "@/lib/services/cart.services";
 import { toPlainObject } from "@/lib/utils";
 import { verifySession } from "@/lib/auth/verify-session";
-import { getCurrentCart } from "@/lib/actions/cart.actions";
 import { OrderRepository } from "@/lib/data/order.repository";
 import { insertOrderSchema } from "@/lib/validators";
 import { handleRepositoryError } from "@/lib/data/error-handler";
@@ -59,12 +59,12 @@ export const OrderService = {
     if (!user?.address) throw new Error("VALIDATION_CART_EMPTY");
     if (!user?.paymentMethod) throw new Error("VALIDATION_NO_PAYMENT_METHOD");
 
-    const cart = await getCurrentCart();
+    const cart = await CartService.getCurrentCart();
     if (!cart || cart.items.length === 0)
       throw new Error("VALIDATION_CART_EMPTY");
 
     const itemsPrice = (
-      cart.items.reduce((acc, item) => {
+      cart.items.reduce((acc: number, item) => {
         return acc + Number(item.price) * item.quantity;
       }, 0) || 0
     ).toFixed(2);
