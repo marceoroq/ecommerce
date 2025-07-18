@@ -1,6 +1,11 @@
-import OrderPricingDetails from "@/components/shared/place-order/order-pricing-details";
-import OrderSummary from "@/components/shared/place-order/order-summary";
 import { OrderService } from "@/lib/services/order.services";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
+import { OrderPricingDetails } from "@/components/shared/order/order-pricing-details";
+import { ShippingAddressDetails } from "@/components/shared/order/shipping-address-details";
+
 import { ShippingAddress } from "@/types";
 
 export default async function Page({
@@ -19,14 +24,51 @@ export default async function Page({
         <h1 className="h2-bold">Order Details</h1>
         <span className="text-xs text-foreground/40">ORDER ID: {id}</span>
       </div>
-      <pre>{JSON.stringify(order, null, 2)}</pre>
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
         <div className="flex flex-col gap-4 md:col-span-2 overflow-x-auto">
-          <OrderSummary
+          <ShippingAddressDetails
             address={order.shippingAddress as ShippingAddress}
-            paymentMethod={order!.paymentMethod}
-            cartItems={order.items}
-          />
+          >
+            {order.isDelivered ? (
+              <Badge
+                variant="secondary"
+                className="h-5 rounded-full font-normal border-gray-300"
+              >
+                Delivered at {String(order.deliveredAt)}
+              </Badge>
+            ) : (
+              <>
+                <Badge className="h-5 gap-1 rounded-full font-medium bg-red-200 border-red-400 text-red-500">
+                  Not Delivered
+                </Badge>
+              </>
+            )}
+          </ShippingAddressDetails>
+
+          <Card>
+            <CardContent className="p-4 gap-4">
+              <div className="flex justify-between">
+                <h2 className="text-xl pb-4 font-medium">Payment Method</h2>
+                {order.isPaid ? (
+                  <Badge
+                    variant="secondary"
+                    className="h-5 rounded-full font-normal border-gray-300"
+                  >
+                    Paid at {String(order.paidAt)}
+                  </Badge>
+                ) : (
+                  <>
+                    <Badge className="h-5 gap-1 rounded-full font-medium bg-red-200 border-red-400 text-red-500">
+                      Not Paid
+                    </Badge>
+                  </>
+                )}
+              </div>
+              <p className="capitalize text-sm">{order!.paymentMethod}</p>
+            </CardContent>
+          </Card>
+
+          <OrderItemsDetails orderItems={order.items} />
         </div>
         <OrderPricingDetails
           subTotal={Number(order.itemsPrice)}
@@ -34,6 +76,7 @@ export default async function Page({
           shippingPrice={Number(order.shippingPrice)}
         />
       </div>
+      <pre>{JSON.stringify(order, null, 2)}</pre>
     </div>
   );
 }

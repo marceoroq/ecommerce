@@ -1,6 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import CreateOrderButton from "@/components/shared/place-order/create-order-button";
+import { CreateOrderButton } from "@/components/shared/order/create-order-button";
 
 type OrderPricingDetailsProps = {
   subTotal: number;
@@ -8,7 +8,7 @@ type OrderPricingDetailsProps = {
   shippingPrice: number;
 };
 
-const OrderPricingDetails = ({
+export const OrderPricingDetails = ({
   subTotal,
   taxPrice,
   shippingPrice,
@@ -41,5 +41,3 @@ const OrderPricingDetails = ({
     </Card>
   );
 };
-
-export default OrderPricingDetails;

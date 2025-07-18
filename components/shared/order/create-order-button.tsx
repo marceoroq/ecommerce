@@ -1,13 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/shared/spinner";
-import { useActionState, useEffect } from "react";
-import { createOrderAction } from "@/lib/actions/order.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
 
-const CreateOrderButton = () => {
+import { createOrderAction } from "@/lib/actions/order.actions";
+
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/shared/spinner";
+
+export const CreateOrderButton = () => {
   const [response, formAction, isPending] = useActionState(
     createOrderAction,
     null
@@ -38,5 +40,3 @@ const CreateOrderButton = () => {
     </form>
   );
 };
-
-export default CreateOrderButton;

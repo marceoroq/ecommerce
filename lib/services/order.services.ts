@@ -6,7 +6,6 @@ import { toPlainObject } from "@/lib/utils";
 import { verifySession } from "@/lib/auth/verify-session";
 import { OrderRepository } from "@/lib/data/order.repository";
 import { insertOrderSchema } from "@/lib/validators";
-import { handleRepositoryError } from "@/lib/data/error-handler";
 
 import { Order, OrderItem } from "@/types";
 import {
@@ -48,7 +47,8 @@ export const OrderService = {
 
       return convertPrismaOrderToPOJO(order);
     } catch (error) {
-      handleRepositoryError(error, "getProductById");
+      console.error(error);
+      return null;
     }
   },
 
