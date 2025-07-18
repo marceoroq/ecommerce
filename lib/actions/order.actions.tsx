@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { OrderService } from "@/lib/services/order.services";
 import { PaypalService } from "@/lib/payments/paypal.services";
 
@@ -56,7 +58,7 @@ export async function createPayPalOrder(orderId: string) {
     const order = await OrderService.getOrderById(orderId);
     if (!order) throw new Error("Order not found");
 
-    const paypalOrder = await PaypalService.createOrder(Number(order.itemsPrice));
+    const paypalOrder = await PaypalService.createOrder(Number(order.totalPrice));
 
     await OrderService.updateOrder(orderId, {
       paypalResult: {
@@ -70,7 +72,11 @@ export async function createPayPalOrder(orderId: string) {
       },
     });
 
-    return { success: true, message: "Paypal Order Created Successfully" };
+    return {
+      success: true,
+      message: "Paypal Order Created Successfully",
+      paypalOrderId: paypalOrder.id,
+    };
   } catch (error) {
     console.error("[Create Paypal Order Action Error]", error);
     return { success: false, message: "Error creating Paypal Order" };
@@ -102,7 +108,7 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
       },
     });
 
-    // TODO: use revalidate, see the difference with and without
+    revalidatePath(`/order/${orderId}`);
 
     return { success: true, message: "Your order has been paid" };
   } catch (error) {

@@ -1,18 +1,15 @@
 import { OrderService } from "@/lib/services/order.services";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { PayPalPayment } from "@/components/shared/order/paypal-payment";
 import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
 import { OrderPricingDetails } from "@/components/shared/order/order-pricing-details";
 import { ShippingAddressDetails } from "@/components/shared/order/shipping-address-details";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 import { ShippingAddress } from "@/types";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const order = await OrderService.getOrderById(id);
 
@@ -26,25 +23,6 @@ export default async function Page({
       </div>
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
         <div className="flex flex-col gap-4 md:col-span-2 overflow-x-auto">
-          <ShippingAddressDetails
-            address={order.shippingAddress as ShippingAddress}
-          >
-            {order.isDelivered ? (
-              <Badge
-                variant="secondary"
-                className="h-5 rounded-full font-normal border-gray-300"
-              >
-                Delivered at {String(order.deliveredAt)}
-              </Badge>
-            ) : (
-              <>
-                <Badge className="h-5 gap-1 rounded-full font-medium bg-red-200 border-red-400 text-red-500">
-                  Not Delivered
-                </Badge>
-              </>
-            )}
-          </ShippingAddressDetails>
-
           <Card>
             <CardContent className="p-4 gap-4">
               <div className="flex justify-between">
@@ -58,7 +36,7 @@ export default async function Page({
                   </Badge>
                 ) : (
                   <>
-                    <Badge className="h-5 gap-1 rounded-full font-medium bg-red-200 border-red-400 text-red-500">
+                    <Badge className="h-5 gap-1 rounded-full font-medium bg-red-100 hover:bg-red-100 border-red-400 text-red-500">
                       Not Paid
                     </Badge>
                   </>
@@ -68,13 +46,38 @@ export default async function Page({
             </CardContent>
           </Card>
 
+          <ShippingAddressDetails address={order.shippingAddress as ShippingAddress}>
+            {order.isDelivered ? (
+              <Badge variant="secondary" className="h-5 rounded-full font-normal border-gray-300">
+                Delivered at {String(order.deliveredAt)}
+              </Badge>
+            ) : (
+              <>
+                <Badge
+                  variant="secondary"
+                  className="h-5 gap-1 rounded-full font-medium bg-red-100 hover:bg-red-100 border-red-400 text-red-500"
+                >
+                  Not Delivered
+                </Badge>
+              </>
+            )}
+          </ShippingAddressDetails>
+
           <OrderItemsDetails orderItems={order.items} />
         </div>
         <OrderPricingDetails
           subTotal={Number(order.itemsPrice)}
           taxPrice={Number(order.taxPrice)}
           shippingPrice={Number(order.shippingPrice)}
-        ></OrderPricingDetails>
+        >
+          {/* PayPal Payment */}
+          {!order.isPaid && order.paymentMethod === "paypal" && (
+            <PayPalPayment
+              orderId={id}
+              options={{ clientId: process.env.PAYPAL_CLIENT_ID || "sb" }}
+            />
+          )}
+        </OrderPricingDetails>
       </div>
       <pre>{JSON.stringify(order, null, 2)}</pre>
     </div>

@@ -1,0 +1,46 @@
+"use client";
+
+import {
+  PayPalButtons,
+  PayPalScriptProvider,
+  ReactPayPalScriptOptions,
+} from "@paypal/react-paypal-js";
+
+import { PayPalLoadingStatus } from "./paypal-loading-status";
+import { approvePayPalOrder, createPayPalOrder } from "@/lib/actions/order.actions";
+import { toast } from "sonner";
+
+type PayPalPaymentProps = {
+  orderId: string;
+  options: ReactPayPalScriptOptions;
+};
+
+export const PayPalPayment = ({ orderId, options }: PayPalPaymentProps) => {
+  async function handleCreateOrder(): Promise<string> {
+    const response = await createPayPalOrder(orderId);
+
+    if (!response.success) {
+      toast.error(response.message);
+      throw new Error(response.message);
+    }
+
+    return response.paypalOrderId;
+  }
+
+  async function handleApprove({ orderID: paypalOrderId }: { orderID: string }): Promise<void> {
+    const response = await approvePayPalOrder(orderId, paypalOrderId);
+
+    if (!response.success) {
+      toast.error(response.message);
+    } else {
+      toast.success(response.message);
+    }
+  }
+
+  return (
+    <PayPalScriptProvider options={options}>
+      <PayPalLoadingStatus />
+      <PayPalButtons createOrder={handleCreateOrder} onApprove={handleApprove} />
+    </PayPalScriptProvider>
+  );
+};
