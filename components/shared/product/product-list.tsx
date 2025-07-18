@@ -6,7 +6,7 @@ import ProductCard from "@/components/shared/product/product-card";
 const ProductList = async () => {
   const productsList = await ProductService.getProducts();
 
-  const limit = 4;
+  const limit = 6;
   const hasProducts = productsList.length > 0;
   const limitedData = limit ? productsList.slice(0, limit) : productsList;
 
