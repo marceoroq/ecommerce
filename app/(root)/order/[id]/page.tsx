@@ -74,7 +74,7 @@ export default async function Page({
           subTotal={Number(order.itemsPrice)}
           taxPrice={Number(order.taxPrice)}
           shippingPrice={Number(order.shippingPrice)}
-        />
+        ></OrderPricingDetails>
       </div>
       <pre>{JSON.stringify(order, null, 2)}</pre>
     </div>

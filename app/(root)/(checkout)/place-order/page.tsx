@@ -14,6 +14,7 @@ import { OrderPricingDetails } from "@/components/shared/order/order-pricing-det
 import { ShippingAddressDetails } from "@/components/shared/order/shipping-address-details";
 
 import { ShippingAddress } from "@/types";
+import { CreateOrderButton } from "@/components/shared/order/create-order-button";
 
 export default async function PlaceOrderPage() {
   const { userId } = await verifySession();
@@ -77,7 +78,9 @@ export default async function PlaceOrderPage() {
           subTotal={subTotal}
           taxPrice={taxPrice}
           shippingPrice={shippingPrice}
-        />
+        >
+          <CreateOrderButton />
+        </OrderPricingDetails>
       </div>
     </div>
   );

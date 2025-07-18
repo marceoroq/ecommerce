@@ -1,14 +1,15 @@
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { CreateOrderButton } from "@/components/shared/order/create-order-button";
 
 type OrderPricingDetailsProps = {
+  children?: React.ReactNode;
   subTotal: number;
   taxPrice: number;
   shippingPrice: number;
 };
 
 export const OrderPricingDetails = ({
+  children,
   subTotal,
   taxPrice,
   shippingPrice,
@@ -36,7 +37,7 @@ export const OrderPricingDetails = ({
           <div className="font-medium">Total</div>
           <div className="font-medium">$ {total.toFixed(2)}</div>
         </div>
-        <CreateOrderButton />
+        {children}
       </CardContent>
     </Card>
   );
