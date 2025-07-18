@@ -3,9 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authConfig } from "@/auth.config";
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|signin|signup|public|assets).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|signin|signup|public|assets).*)"],
 };
 
 const { auth } = NextAuth(authConfig);
@@ -27,14 +25,8 @@ export default async function middleware(request: NextRequest) {
 
   // Routing protection
   const session = await auth();
-  const protectedRoutes = [
-    "/shipping-address",
-    "/payment-method",
-    "/place-order",
-  ];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    path.startsWith(route)
-  );
+  const protectedRoutes = ["/shipping-address", "/payment-method", "/place-order", "/order"];
+  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
 
   if (isProtectedRoute && !session) {
     const loginUrl = new URL("/signin", request.url);

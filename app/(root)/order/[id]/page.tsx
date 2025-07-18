@@ -8,12 +8,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 import { ShippingAddress } from "@/types";
+import { verifySession } from "@/lib/auth/verify-session";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const order = await OrderService.getOrderById(id);
+  const { userId } = await verifySession();
 
-  if (!order) return "NO ORDER FOUNDED";
+  const order = await OrderService.getOrderById(id);
+  if (!order) return "Order not found";
+
+  // TODO: add admin view permissions
+  // Users can only view their own orders
+  if (order.userId !== userId) return "Not Authorized to see this page";
 
   return (
     <div className="flex flex-col gap-4 py-4">
