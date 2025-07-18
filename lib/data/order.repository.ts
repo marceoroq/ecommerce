@@ -1,14 +1,10 @@
 import "server-only";
 
 import prisma from "@/lib/prisma";
-import {
-  Order as PrismaModel,
-  OrderItem as PrismaOrderItem,
-  Prisma,
-} from "@/lib/generated/prisma";
+import { Order as PrismaModel, OrderItem as PrismaOrderItem, Prisma } from "@/lib/generated/prisma";
 import { OrderItem } from "@/types";
 
-export type OrderWithItemsAndUser = PrismaModel & {
+export type OrderWithItems = PrismaModel & {
   OrderItem: PrismaOrderItem[];
 };
 
@@ -22,9 +18,7 @@ export const OrderRepository = {
     return await prisma.order.findUnique(args);
   },
 
-  findByIdWithDetails: async (
-    id: string
-  ): Promise<OrderWithItemsAndUser | null> => {
+  findByIdWithDetails: async (id: string): Promise<OrderWithItems | null> => {
     return prisma.order.findUnique({
       where: { id },
       include: {
@@ -76,23 +70,14 @@ export const OrderRepository = {
     });
   },
 
-  createMany: async (
-    data: Prisma.OrderCreateManyInput[]
-  ): Promise<Prisma.BatchPayload> => await prisma.order.createMany({ data }),
+  createMany: async (data: Prisma.OrderCreateManyInput[]): Promise<Prisma.BatchPayload> =>
+    await prisma.order.createMany({ data }),
 
-  update: async (
-    id: string,
-    data: Prisma.OrderUpdateInput
-  ): Promise<PrismaModel> =>
-    await prisma.order.update({
-      where: { id },
-      data,
-    }),
+  update: async (id: string, data: Prisma.OrderUpdateInput): Promise<PrismaModel> =>
+    await prisma.order.update({ where: { id }, data }),
 
-  delete: async (id: string): Promise<PrismaModel> =>
-    await prisma.order.delete({ where: { id } }),
+  delete: async (id: string): Promise<PrismaModel> => await prisma.order.delete({ where: { id } }),
 
-  deleteMany: async (
-    options?: Prisma.OrderDeleteManyArgs
-  ): Promise<Prisma.BatchPayload> => await prisma.order.deleteMany(options),
+  deleteMany: async (options?: Prisma.OrderDeleteManyArgs): Promise<Prisma.BatchPayload> =>
+    await prisma.order.deleteMany(options),
 };

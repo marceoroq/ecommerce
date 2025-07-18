@@ -99,3 +99,13 @@ export const insertOrderSchema = z.object({
   totalPrice: currencyValidation,
   items: z.array(insertOrderItemSchema).min(1, "At least one item is required"),
 });
+
+export const paymentResultSchema = z.object({
+  id: z.string(),
+  status: z.string(),
+  pricePaid: z.string(),
+  payer: z.object({
+    emailAddress: z.string(),
+    payerId: z.string(),
+  }),
+});

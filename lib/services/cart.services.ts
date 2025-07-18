@@ -1,12 +1,13 @@
 import "server-only";
 
-import prisma from "@/lib/prisma";
-import { Cart as PrismaModel, Prisma } from "@/lib/generated/prisma";
-import { Cart } from "@/types";
-import { toPlainObject } from "@/lib/utils";
-import { CartRepository } from "../data/cart.repository";
-import { UserService } from "./user.services";
 import { cache } from "react";
+
+import { UserService } from "@/lib/services/user.services";
+import { CartRepository } from "@/lib/data/cart.repository";
+
+import { Cart } from "@/types";
+import { Cart as PrismaModel, Prisma } from "@/lib/generated/prisma";
+import { toPlainObject } from "@/lib/utils";
 
 export function convertPrismaCartToPOJO(prismaCart: PrismaModel): Cart {
   return {
@@ -34,25 +35,17 @@ const getCurrentCart = cache(async (sessionCartId = "") => {
 export const CartService = {
   getCurrentCart,
 
-  getCartById: async (id: string): Promise<PrismaModel | null> =>
-    await CartRepository.findById(id),
+  getCartById: async (id: string): Promise<PrismaModel | null> => await CartRepository.findById(id),
 
   getCartByUserId: async (userId: string): Promise<PrismaModel | null> =>
     await CartRepository.findByUserId(userId),
 
-  getCartBySessionCartId: async (
-    sessionCartId: string
-  ): Promise<PrismaModel | null> =>
+  getCartBySessionCartId: async (sessionCartId: string): Promise<PrismaModel | null> =>
     await CartRepository.findBySessionCartId(sessionCartId),
 
-  getCartItemQuantity: async (
-    productId: string,
-    sessionCartId?: string
-  ): Promise<number> => {
+  getCartItemQuantity: async (productId: string, sessionCartId?: string): Promise<number> => {
     const cart = await getCurrentCart(sessionCartId);
-    return (
-      cart?.items.find((item) => item.productId === productId)?.quantity || 0
-    );
+    return cart?.items.find((item) => item.productId === productId)?.quantity || 0;
   },
 
   hasCartItems: async (sessionCartId?: string): Promise<boolean> => {
@@ -69,12 +62,6 @@ export const CartService = {
     });
   },
 
-  updateCart: async (
-    id: string,
-    data: Prisma.CartUpdateInput
-  ): Promise<PrismaModel> =>
-    await prisma.cart.update({
-      where: { id },
-      data,
-    }),
+  updateCart: async (id: string, data: Prisma.CartUpdateInput): Promise<PrismaModel> =>
+    await CartRepository.update(id, data),
 };

@@ -7,6 +7,7 @@ import {
   paymentMethodSchema,
   insertOrderItemSchema,
   insertOrderSchema,
+  paymentResultSchema,
 } from "@/lib/validators";
 
 export type Product = z.infer<typeof insertProductSchema> & {
@@ -47,13 +48,36 @@ export type Order = z.infer<typeof insertOrderSchema> & {
   // user: {name: string, email: string}
 };
 
-export type PaypalResult = {
+export type PaypalResult = z.infer<typeof paymentResultSchema> & {
+  createTime?: string;
+  updateTime?: string;
+};
+
+type PayPalPayer = {
+  payer_id: string;
+  email_address: string;
+};
+
+type PayPalAmount = {
+  currency_code: string;
+  value: string;
+};
+
+type PayPalCapture = {
+  amount: PayPalAmount;
+};
+
+type PayPalPayments = {
+  captures: PayPalCapture[];
+};
+
+type PayPalPurchaseUnit = {
+  payments: PayPalPayments;
+};
+
+export type PayPalCaptureResponse = {
   id: string;
   status: string;
-  payer: {
-    email_address: string;
-    payer_id: string;
-  };
-  create_time: string;
-  update_time: string;
+  payer: PayPalPayer;
+  purchase_units: PayPalPurchaseUnit[];
 };

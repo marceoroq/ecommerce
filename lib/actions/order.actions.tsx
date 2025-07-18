@@ -1,6 +1,7 @@
 "use server";
 
 import { OrderService } from "@/lib/services/order.services";
+import { PaypalService } from "@/lib/payments/paypal.services";
 
 export async function createOrderAction() {
   try {
@@ -47,5 +48,65 @@ export async function createOrderAction() {
       message,
       redirectTo,
     };
+  }
+}
+
+export async function createPayPalOrder(orderId: string) {
+  try {
+    const order = await OrderService.getOrderById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    const paypalOrder = await PaypalService.createOrder(Number(order.itemsPrice));
+
+    await OrderService.updateOrder(orderId, {
+      paypalResult: {
+        id: paypalOrder.id,
+        status: "",
+        pricePaid: 0,
+        payer: {
+          emailAddress: "",
+          payerId: "",
+        },
+      },
+    });
+
+    return { success: true, message: "Paypal Order Created Successfully" };
+  } catch (error) {
+    console.error("[Create Paypal Order Action Error]", error);
+    return { success: false, message: "Error creating Paypal Order" };
+  }
+}
+
+export async function approvePayPalOrder(orderId: string, paypalOrderId: string) {
+  try {
+    const order = await OrderService.getOrderById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    const captureData = await PaypalService.capturePayment(paypalOrderId);
+
+    if (
+      !captureData ||
+      captureData.id !== order.paypalResult?.id ||
+      captureData.status !== "COMPLETED"
+    ) {
+      throw new Error("Error in PayPal payment");
+    }
+
+    await OrderService.updateOrderToPaid(orderId, {
+      id: captureData.id,
+      status: captureData.status,
+      pricePaid: captureData.purchase_units[0].payments.captures[0].amount.value,
+      payer: {
+        emailAddress: captureData.payer.email_address,
+        payerId: captureData.payer.payer_id,
+      },
+    });
+
+    // TODO: use revalidate, see the difference with and without
+
+    return { success: true, message: "Your order has been paid" };
+  } catch (error) {
+    console.error("[Approve PayPal Order Action error]", error);
+    return { success: false, message: "Error approving Paypal Order" };
   }
 }

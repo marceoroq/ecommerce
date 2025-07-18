@@ -1,3 +1,7 @@
+import "server-only";
+
+import { PayPalCaptureResponse } from "@/types";
+
 const PAYPAL_API_BASE_URL = process.env.PAYPAL_API_BASE_URL || "https://api-m.sandbox.paypal.com";
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
 const PAYPAL_SECRET = process.env.PAYPAL_SECRET;
@@ -34,7 +38,7 @@ export const PaypalService = {
     return await response.json();
   },
 
-  capturePayment: async (orderId: string) => {
+  capturePayment: async (orderId: string): Promise<PayPalCaptureResponse> => {
     const accessToken = await generateAccessToken();
     const url = `${PAYPAL_API_BASE_URL}/v2/checkout/orders/${orderId}/capture`;
 
