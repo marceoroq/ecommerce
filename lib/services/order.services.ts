@@ -56,15 +56,21 @@ export const OrderService = {
     userId: string;
     limit?: number;
     page?: number;
-  }): Promise<Order[]> => {
-    const orders = await OrderRepository.findAll({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+  }): Promise<{ data: Order[]; totalCount: number }> => {
+    const [orders, totalCount] = await Promise.all([
+      OrderRepository.findAll({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
+      OrderRepository.count({ where: { userId } }),
+    ]);
 
-    return orders.map((order) => convertPrismaOrderToPOJO(order));
+    return {
+      data: orders.map((order) => convertPrismaOrderToPOJO(order)),
+      totalCount,
+    };
   },
 
   createOrder: async (): Promise<string> => {

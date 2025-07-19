@@ -14,4 +14,4 @@ export const SHIPPING_ADDRESS_DEFAULT = {
 export const PAYMENT_METHODS = ["paypal", "stripe", "cash"];
 export const PAYMENT_METHOD_DEFAULT = "stripe";
 
-export const ORDERS_PAGE_SIZE = 4;
+export const ORDERS_PAGE_SIZE = 5;

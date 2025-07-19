@@ -12,6 +12,9 @@ export const OrderRepository = {
   findAll: async (options?: Prisma.OrderFindManyArgs): Promise<PrismaModel[]> =>
     await prisma?.order.findMany(options),
 
+  count: async (options?: Prisma.OrderCountArgs): Promise<number> =>
+    await prisma?.order.count(options),
+
   findById: async <T extends Prisma.OrderFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.OrderFindUniqueArgs>
   ): Promise<Prisma.OrderGetPayload<T> | null> => {

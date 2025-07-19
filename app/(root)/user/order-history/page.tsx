@@ -1,10 +1,27 @@
-import { OrderHistoryTable } from "@/components/shared/order/order-history-table";
-import { verifySession } from "@/lib/auth/verify-session";
 import { OrderService } from "@/lib/services/order.services";
+import { verifySession } from "@/lib/auth/verify-session";
 
-export default async function OrderHistoryPage() {
+import { TablePagination } from "@/components/shared/table-pagination";
+import { OrderHistoryTable } from "@/components/shared/order/order-history-table";
+
+export default async function OrderHistoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const page = Number((await searchParams).page) || 1;
   const { userId } = await verifySession();
-  const orders = await OrderService.getOrdersByUserId({ userId });
 
-  return <OrderHistoryTable orderHistory={orders} />;
+  const { data: orders, totalCount } = await OrderService.getOrdersByUserId({ userId, page });
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* The min-height (in this case min-h-56) depends of the ORDERS_PAGE_SIZE, 
+      the idea of this min height is to keep the pagination buttons in a fix position */}
+      <div className="min-h-56">
+        <OrderHistoryTable orderHistory={orders} />
+      </div>
+      <TablePagination totalItems={totalCount} currentPage={page} className="justify-end" />
+    </div>
+  );
 }
