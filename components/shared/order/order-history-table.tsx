@@ -4,7 +4,6 @@ import dateFormat from "dateformat";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -16,7 +15,6 @@ import { Order } from "@/types";
 export const OrderHistoryTable = ({ orderHistory }: { orderHistory: Order[] }) => {
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>ID</TableHead>
