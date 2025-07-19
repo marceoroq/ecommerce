@@ -24,7 +24,7 @@ export const UserSidebarMenu = ({ isAdmin }: { isAdmin: boolean }) => {
       defaultValue={options[0].value}
       className="w-full flex flex-row items-start gap-4"
     >
-      <TabsList className="shrink-0 grid grid-cols-1 w-full gap-2 p-0 bg-background">
+      <TabsList className="h-fit shrink-0 grid grid-cols-1 w-full gap-2 p-0 bg-background">
         {options.map((tab) => (
           <TabsTrigger
             key={tab.value}

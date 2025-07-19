@@ -11,6 +11,8 @@ import { insertOrderSchema } from "@/lib/validators";
 import { Order, OrderItem, PaypalResult } from "@/types";
 import { Prisma, Order as PrismaOrder, OrderItem as PrismaOrderItem } from "@/lib/generated/prisma";
 
+import { ORDERS_PAGE_SIZE } from "@/lib/constants";
+
 function convertPrismaOrderItemToPOJO(orderItem: Omit<PrismaOrderItem, "orderId">): OrderItem {
   return {
     ...toPlainObject(orderItem),
@@ -18,7 +20,7 @@ function convertPrismaOrderItemToPOJO(orderItem: Omit<PrismaOrderItem, "orderId"
   };
 }
 
-function convertPrismaOrderToPOJO(order: PrismaOrder & { OrderItem: PrismaOrderItem[] }): Order {
+function convertPrismaOrderToPOJO(order: PrismaOrder & { OrderItem?: PrismaOrderItem[] }): Order {
   const { OrderItem, ...restOrder } = order;
   return {
     ...toPlainObject(restOrder),
@@ -26,7 +28,7 @@ function convertPrismaOrderToPOJO(order: PrismaOrder & { OrderItem: PrismaOrderI
     totalPrice: order.totalPrice.toFixed(2),
     itemsPrice: order.itemsPrice.toFixed(2),
     shippingPrice: order.shippingPrice.toFixed(2),
-    items: OrderItem.map(convertPrismaOrderItemToPOJO),
+    items: OrderItem?.map(convertPrismaOrderItemToPOJO) || [],
     paypalResult: JSON.parse(JSON.stringify(order.paypalResult)),
     shippingAddress: JSON.parse(JSON.stringify(order.shippingAddress)),
   };
@@ -44,6 +46,25 @@ export const OrderService = {
       console.error(error);
       return null;
     }
+  },
+
+  getOrdersByUserId: async ({
+    userId,
+    limit = ORDERS_PAGE_SIZE,
+    page = 1,
+  }: {
+    userId: string;
+    limit?: number;
+    page?: number;
+  }): Promise<Order[]> => {
+    const orders = await OrderRepository.findAll({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    return orders.map((order) => convertPrismaOrderToPOJO(order));
   },
 
   createOrder: async (): Promise<string> => {

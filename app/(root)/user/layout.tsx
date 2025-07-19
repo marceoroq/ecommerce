@@ -11,11 +11,11 @@ export default async function UserLayout({ children }: { children: React.ReactNo
         <h2 className="h2-bold pt-4">My Profile</h2>
         <p className="text-gray-500">Manage your orders and preferences here.</p>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-5 h-56">
+      <div className="grid grid-cols-1 lg:grid-cols-5 h-full">
         <div className="col-span-1 p-2">
           <UserSidebarMenu isAdmin={isAdmin} />
         </div>
-        <div className="lg:col-span-4 p-4">{children}</div>
+        <div className="col-span-1 lg:col-span-4 p-4">{children}</div>
       </div>
     </div>
   );

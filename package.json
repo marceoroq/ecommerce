@@ -28,6 +28,7 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dateformat": "^5.0.3",
     "dotenv": "^17.0.1",
     "framer-motion": "^12.23.3",
     "lucide-react": "^0.525.0",
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/dateformat": "^5.0.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
