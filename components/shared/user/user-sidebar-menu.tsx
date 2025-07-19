@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -16,12 +19,15 @@ const adminOptions = [
 ];
 
 export const UserSidebarMenu = ({ isAdmin }: { isAdmin: boolean }) => {
+  const pathname = usePathname();
+  const currentPath = pathname.split("/").at(-1);
+
   const options = isAdmin ? adminOptions : userOptions;
 
   return (
     <Tabs
       orientation="vertical"
-      defaultValue={options[0].value}
+      defaultValue={currentPath}
       className="w-full flex flex-row items-start gap-4"
     >
       <TabsList className="h-fit shrink-0 grid grid-cols-1 w-full gap-2 p-0 bg-background">

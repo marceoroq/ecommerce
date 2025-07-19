@@ -51,14 +51,16 @@ const UserButton = async () => {
             <div className="font-semibold">{user.name}</div>
             <div className="text-muted-foreground">{user.email}</div>
           </div>
-          <DropdownMenuShortcut className="capitalize">
-            {user.role}
-          </DropdownMenuShortcut>
+          <DropdownMenuShortcut className="capitalize">{user.role}</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Order History</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/user/profile">Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/user/order-history">Order History</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem>Admin Panel</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
