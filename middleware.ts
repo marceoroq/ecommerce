@@ -25,7 +25,13 @@ export default async function middleware(request: NextRequest) {
 
   // Routing protection
   const session = await auth();
-  const protectedRoutes = ["/shipping-address", "/payment-method", "/place-order", "/order"];
+  const protectedRoutes = [
+    "/shipping-address",
+    "/payment-method",
+    "/place-order",
+    "/order",
+    "/user",
+  ];
   const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
 
   if (isProtectedRoute && !session) {
