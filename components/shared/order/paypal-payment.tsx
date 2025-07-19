@@ -38,9 +38,16 @@ export const PayPalPayment = ({ orderId, options }: PayPalPaymentProps) => {
   }
 
   return (
-    <PayPalScriptProvider options={options}>
-      <PayPalLoadingStatus />
-      <PayPalButtons createOrder={handleCreateOrder} onApprove={handleApprove} />
-    </PayPalScriptProvider>
+    // The colorSheme style is to avoid a white background in dark mode
+    <div style={{ colorScheme: "none" }}>
+      <PayPalScriptProvider options={options}>
+        <PayPalLoadingStatus />
+        <PayPalButtons
+          style={{ color: "blue" }}
+          createOrder={handleCreateOrder}
+          onApprove={handleApprove}
+        />
+      </PayPalScriptProvider>
+    </div>
   );
 };
