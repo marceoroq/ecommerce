@@ -15,7 +15,7 @@ export default async function UserLayout({ children }: { children: React.ReactNo
         <div className="col-span-1 py-2">
           <UserSidebarMenu isAdmin={isAdmin} />
         </div>
-        <div className="col-span-1 lg:col-span-4 p-4">{children}</div>
+        <div className="col-span-1 lg:col-span-4 px-6 py-2">{children}</div>
       </div>
     </div>
   );

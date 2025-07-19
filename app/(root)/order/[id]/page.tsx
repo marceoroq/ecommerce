@@ -42,7 +42,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                   </Badge>
                 ) : (
                   <>
-                    <Badge className="h-5 gap-1 rounded-full font-medium bg-red-100 hover:bg-red-100 border-red-400 text-red-500">
+                    <Badge className="h-5 gap-1 rounded-full font-medium bg-red-100 dark:bg-red-950 hover:bg-red-100 border-red-400 text-red-500">
                       Not Paid
                     </Badge>
                   </>
@@ -61,7 +61,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               <>
                 <Badge
                   variant="secondary"
-                  className="h-5 gap-1 rounded-full font-medium bg-red-100 hover:bg-red-100 border-red-400 text-red-500"
+                  className="h-5 gap-1 rounded-full font-medium bg-red-100 dark:bg-red-950 hover:bg-red-100 border-red-400 text-red-500"
                 >
                   Not Delivered
                 </Badge>
