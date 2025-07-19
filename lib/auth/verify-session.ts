@@ -6,10 +6,12 @@ import { redirect } from "next/navigation";
 
 export const verifySession = cache(async () => {
   const session = await auth();
-  const isAdmin = session?.user?.role === "admin";
-  const userId = session?.user?.id;
 
-  if (!userId) redirect("/signin");
+  if (!session) redirect("/signin");
 
-  return { isAuth: true, userId, isAdmin };
+  const user = session.user;
+  const userId = session.user?.id;
+  const isAdmin = session.user?.role === "admin";
+
+  return { isAuth: true, userId, isAdmin, user };
 });
