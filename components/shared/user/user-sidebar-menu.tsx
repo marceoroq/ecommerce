@@ -27,7 +27,7 @@ export const UserSidebarMenu = ({ isAdmin }: { isAdmin: boolean }) => {
   return (
     <Tabs
       orientation="vertical"
-      defaultValue={currentPath}
+      value={currentPath}
       className="w-full flex flex-row items-start gap-4"
     >
       <TabsList className="h-fit shrink-0 grid grid-cols-1 w-full gap-2 p-0 bg-background">
