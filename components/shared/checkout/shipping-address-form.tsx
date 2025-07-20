@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -33,12 +32,12 @@ const ShippingAddressForm = ({ address }: ShippingAddressFormProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof shippingAddressSchema>>({
+  const form = useForm<ShippingAddress>({
     resolver: zodResolver(shippingAddressSchema),
     defaultValues: address || SHIPPING_ADDRESS_DEFAULT,
   });
 
-  async function onSubmit(values: z.infer<typeof shippingAddressSchema>) {
+  async function onSubmit(values: ShippingAddress) {
     setIsLoading(true);
 
     const response = await updateUserAddressAction(values);
@@ -58,9 +57,7 @@ const ShippingAddressForm = ({ address }: ShippingAddressFormProps) => {
     <div className="max-w-md w-full mx-auto flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="h2-bold">Shipping Address</h1>
-        <p className="text-sm text-muted-foreground">
-          Please enter an address to ship to
-        </p>
+        <p className="text-sm text-muted-foreground">Please enter an address to ship to</p>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -71,11 +68,7 @@ const ShippingAddressForm = ({ address }: ShippingAddressFormProps) => {
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Input
-                    className="!mt-0"
-                    placeholder="Joseph Key"
-                    {...field}
-                  />
+                  <Input className="!mt-0" placeholder="Joseph Key" {...field} />
                 </FormControl>
                 <FormMessage className="font-normal" />
               </FormItem>
@@ -88,11 +81,7 @@ const ShippingAddressForm = ({ address }: ShippingAddressFormProps) => {
               <FormItem className="!mt-6">
                 <FormLabel>Street Address</FormLabel>
                 <FormControl>
-                  <Input
-                    className="!mt-0"
-                    placeholder="St. Saint Thomas 123"
-                    {...field}
-                  />
+                  <Input className="!mt-0" placeholder="St. Saint Thomas 123" {...field} />
                 </FormControl>
                 <FormMessage className="font-normal" />
               </FormItem>

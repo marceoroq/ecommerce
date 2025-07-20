@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { SiPaypal } from "react-icons/si";
@@ -33,7 +32,7 @@ type PaymentMethodFormProps = {
 const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof paymentMethodSchema>>({
+  const form = useForm<PaymentMethod>({
     resolver: zodResolver(paymentMethodSchema),
     defaultValues: { type: paymentMethod || PAYMENT_METHOD_DEFAULT },
   });
@@ -53,9 +52,7 @@ const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
     <div className="max-w-xs w-full mx-auto flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="h2-bold">Payment Method</h1>
-        <p className="text-sm text-muted-foreground">
-          Please confirm a payment method to continue
-        </p>
+        <p className="text-sm text-muted-foreground">Please confirm a payment method to continue</p>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -78,25 +75,17 @@ const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
                         </FormLabel>
                       </div>
                       <FormControl>
-                        <RadioGroupItem
-                          className="border-gray-400 !mt-0"
-                          value="stripe"
-                        />
+                        <RadioGroupItem className="border-gray-400 !mt-0" value="stripe" />
                       </FormControl>
                     </FormItem>
 
                     <FormItem className="flex p-3 items-center justify-between gap-3 hover:bg-foreground/10 rounded-md">
                       <div className="flex gap-2 items-center">
                         <SiPaypal className="size-5" />
-                        <FormLabel className="font-normal cursor-pointer">
-                          PayPal
-                        </FormLabel>
+                        <FormLabel className="font-normal cursor-pointer">PayPal</FormLabel>
                       </div>
                       <FormControl>
-                        <RadioGroupItem
-                          className="border-gray-400 !mt-0"
-                          value="paypal"
-                        />
+                        <RadioGroupItem className="border-gray-400 !mt-0" value="paypal" />
                       </FormControl>
                     </FormItem>
 
@@ -108,10 +97,7 @@ const PaymentMethodForm = ({ paymentMethod }: PaymentMethodFormProps) => {
                         </FormLabel>
                       </div>
                       <FormControl>
-                        <RadioGroupItem
-                          className="border-gray-400 !mt-0"
-                          value="cash"
-                        />
+                        <RadioGroupItem className="border-gray-400 !mt-0" value="cash" />
                       </FormControl>
                     </FormItem>
                   </RadioGroup>
