@@ -10,7 +10,12 @@ export const authConfig = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
+      // this update is executed when we update name in profile
+      if (trigger === "update") {
+        token.name = session.user.name;
+      }
+
       if (user) {
         token.id = user.id;
         token.role = user.role;

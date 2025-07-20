@@ -10,11 +10,12 @@ import {
   shippingAddressSchema,
   signInFormSchema,
   signUpFormSchema,
+  updateUserProfileSchema,
 } from "@/lib/validators";
 
 import { UserService } from "@/lib/services/user.services";
 
-import { PaymentMethod, ShippingAddress } from "@/types";
+import { PaymentMethod, ShippingAddress, UserProfile } from "@/types";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
@@ -80,10 +81,7 @@ export async function signInWithCredentials(
   }
 }
 
-export async function signUpWithCredentials(
-  prevState: unknown,
-  formData: FormData
-) {
+export async function signUpWithCredentials(prevState: unknown, formData: FormData) {
   const name = formData.get("name");
   const email = formData.get("email");
   const password = formData.get("password");
@@ -105,11 +103,7 @@ export async function signUpWithCredentials(
       };
     }
 
-    const {
-      name: userName,
-      email: userEmail,
-      password: userPassword,
-    } = validatedFields.data;
+    const { name: userName, email: userEmail, password: userPassword } = validatedFields.data;
 
     const foundUser = await UserService.getUserByEmail(userEmail);
 
@@ -175,4 +169,16 @@ export async function updateUserPaymentMethodAction(data: PaymentMethod) {
   }
 
   redirect("/place-order");
+}
+
+export async function updateUserName(data: UserProfile) {
+  try {
+    const validatedUserName = updateUserProfileSchema.parse(data);
+    await UserService.updateUser({ name: validatedUserName.name });
+
+    return { success: true, message: "Name updated successfully" };
+  } catch (error) {
+    console.error(`[UPDATE USER NAME ACTION ERROR]: ${error}`);
+    return { success: false, message: String(error) };
+  }
 }
