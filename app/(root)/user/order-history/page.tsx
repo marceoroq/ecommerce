@@ -2,7 +2,7 @@ import { OrderService } from "@/lib/services/order.services";
 import { verifySession } from "@/lib/auth/verify-session";
 
 import { TablePagination } from "@/components/shared/table-pagination";
-import { OrderHistoryTable } from "@/components/shared/order/order-history-table";
+import { OrderHistoryTable } from "@/components/shared/order-history/order-history-table";
 
 export default async function OrderHistoryPage({
   searchParams,

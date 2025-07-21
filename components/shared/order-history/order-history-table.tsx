@@ -2,7 +2,7 @@ import Link from "next/link";
 import dateFormat from "dateformat";
 import { Pencil } from "lucide-react";
 
-import { DeleteOrderButton } from "@/components/shared/order/delete-order-button";
+import { DeleteOrderButton } from "@/components/shared/order-history/delete-order-button";
 import { Button } from "@/components/ui/button";
 import {
   Table,
