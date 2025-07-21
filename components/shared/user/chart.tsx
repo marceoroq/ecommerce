@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
+import { cn } from "@/lib/utils";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -30,7 +32,13 @@ const DAYS_TIME_RANGES: Record<string, number> = {
   "3d": 3,
 };
 
-export function Chart({ data }: { data: { date: string; totalSales: number }[] }) {
+export function Chart({
+  data,
+  className = "",
+}: {
+  data: { date: string; totalSales: number }[];
+  className?: string;
+}) {
   const [timeRange, setTimeRange] = React.useState("30d");
 
   const filteredData = data.filter((item) => {
@@ -45,7 +53,7 @@ export function Chart({ data }: { data: { date: string; totalSales: number }[] }
   });
 
   return (
-    <Card className="py-0">
+    <Card className={cn("py-0", className)}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Bar Chart - Interactive</CardTitle>

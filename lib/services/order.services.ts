@@ -84,7 +84,8 @@ export const OrderService = {
     const latestSales = await OrderRepository.findLatestSales();
 
     // Calculate the total sales
-    const totalRevenue = await OrderRepository.aggregate({ _sum: { totalPrice: true } });
+    const totalRevenue = (await OrderRepository.aggregate({ _sum: { totalPrice: true } }))._sum
+      ?.totalPrice;
 
     // Get daily sales
     const salesByDateData = await OrderRepository.querySalesByDate();

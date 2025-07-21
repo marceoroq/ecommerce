@@ -9,7 +9,7 @@ import {
 } from "@/lib/generated/prisma";
 import { OrderItem } from "@/types";
 
-export type OrderWithItems = PrismaModel & {
+type OrderWithItems = PrismaModel & {
   OrderItem: PrismaOrderItem[];
 };
 
@@ -51,7 +51,7 @@ export const OrderRepository = {
         user: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: 6,
+      take: 5,
     }),
 
   count: async (options?: Prisma.OrderCountArgs): Promise<number> =>
