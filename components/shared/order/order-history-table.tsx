@@ -1,9 +1,9 @@
 import Link from "next/link";
 import dateFormat from "dateformat";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil } from "lucide-react";
 
+import { DeleteOrderButton } from "@/components/shared/order/delete-order-button";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -44,26 +44,12 @@ export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTablePr
               {order.isDelivered ? dateFormat(order.deliveredAt!) : "Not Delivered"}
             </TableCell>
             {isAdmin ? (
-              <TooltipProvider>
-                <TableCell className="flex justify-center gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button className="size-6" variant="outline">
-                        <Pencil />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Edit product</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button className="size-6" variant="destructive">
-                        <Trash2 />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Delete product</TooltipContent>
-                  </Tooltip>
-                </TableCell>
-              </TooltipProvider>
+              <TableCell className="flex justify-center gap-2">
+                <Button className="size-6" variant="outline">
+                  <Pencil />
+                </Button>
+                <DeleteOrderButton orderId={order.id} />
+              </TableCell>
             ) : (
               <TableCell className="text-right">
                 <Link href={`/order/${order.id}`}>Details</Link>

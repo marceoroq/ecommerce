@@ -120,6 +120,7 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
 export async function deleteOrderByIdAction(orderId: string) {
   try {
     await OrderService.deleteOrderById(orderId);
+    return { success: true, message: "Order deleted successfully" };
   } catch (error) {
     console.error("[Delete Order Action error]", error);
     return { success: false, message: "Error trying to delete order" };
