@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,7 +23,6 @@ import {
 } from "@/components/ui/form";
 
 import { SHIPPING_ADDRESS_DEFAULT } from "@/lib/constants";
-import { toast } from "sonner";
 
 type ShippingAddressFormProps = {
   address?: ShippingAddress;
