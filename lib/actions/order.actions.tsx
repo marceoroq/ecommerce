@@ -116,3 +116,12 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
     return { success: false, message: "Error approving Paypal Order" };
   }
 }
+
+export async function deleteOrderByIdAction(orderId: string) {
+  try {
+    await OrderService.deleteOrderById(orderId);
+  } catch (error) {
+    console.error("[Delete Order Action error]", error);
+    return { success: false, message: "Error trying to delete order" };
+  }
+}

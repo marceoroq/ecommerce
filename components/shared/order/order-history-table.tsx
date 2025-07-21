@@ -1,6 +1,9 @@
 import Link from "next/link";
 import dateFormat from "dateformat";
+import { Pencil, Trash2 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -12,7 +15,12 @@ import {
 
 import { Order } from "@/types";
 
-export const OrderHistoryTable = ({ orderHistory }: { orderHistory: Order[] }) => {
+type OrderHistoryTableProps = {
+  isAdmin: boolean;
+  orderHistory: Order[];
+};
+
+export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTableProps) => {
   return (
     <Table>
       <TableHeader>
@@ -22,7 +30,7 @@ export const OrderHistoryTable = ({ orderHistory }: { orderHistory: Order[] }) =
           <TableHead className="text-center">Total</TableHead>
           <TableHead>Paid</TableHead>
           <TableHead>Delivered</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead className="text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -35,9 +43,32 @@ export const OrderHistoryTable = ({ orderHistory }: { orderHistory: Order[] }) =
             <TableCell>
               {order.isDelivered ? dateFormat(order.deliveredAt!) : "Not Delivered"}
             </TableCell>
-            <TableCell className="text-right">
-              <Link href={`/order/${order.id}`}>Details</Link>
-            </TableCell>
+            {isAdmin ? (
+              <TooltipProvider>
+                <TableCell className="flex justify-center gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button className="size-6" variant="outline">
+                        <Pencil />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Edit product</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button className="size-6" variant="destructive">
+                        <Trash2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete product</TooltipContent>
+                  </Tooltip>
+                </TableCell>
+              </TooltipProvider>
+            ) : (
+              <TableCell className="text-right">
+                <Link href={`/order/${order.id}`}>Details</Link>
+              </TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>

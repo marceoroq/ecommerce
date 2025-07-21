@@ -105,7 +105,8 @@ export const OrderRepository = {
   update: async (id: string, data: Prisma.OrderUpdateInput): Promise<PrismaModel> =>
     await prisma.order.update({ where: { id }, data }),
 
-  delete: async (id: string): Promise<PrismaModel> => await prisma.order.delete({ where: { id } }),
+  delete: async (options: Prisma.OrderDeleteArgs): Promise<PrismaModel> =>
+    await prisma.order.delete(options),
 
   deleteMany: async (options?: Prisma.OrderDeleteManyArgs): Promise<Prisma.BatchPayload> =>
     await prisma.order.deleteMany(options),

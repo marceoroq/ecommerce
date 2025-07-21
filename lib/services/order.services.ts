@@ -75,6 +75,28 @@ export const OrderService = {
     };
   },
 
+  getAllOrders: async ({
+    limit = ORDERS_PAGE_SIZE,
+    page = 1,
+  }: {
+    limit?: number;
+    page?: number;
+  }): Promise<{ data: Order[]; totalCount: number }> => {
+    const [orders, totalCount] = await Promise.all([
+      OrderRepository.findAll({
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: (page - 1) * limit,
+      }),
+      OrderRepository.count(),
+    ]);
+
+    return {
+      data: orders.map((order) => convertPrismaOrderToPOJO(order)),
+      totalCount,
+    };
+  },
+
   getOrderAdminSummary: async () => {
     const usersCount = await UserRepository.count();
     const ordersCount = await OrderRepository.count();
@@ -181,5 +203,9 @@ export const OrderService = {
     });
 
     return updatedOrder;
+  },
+
+  deleteOrderById: async (id: string) => {
+    await OrderRepository.delete({ where: { id } });
   },
 };
