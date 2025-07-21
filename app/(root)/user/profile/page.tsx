@@ -9,6 +9,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4 w-full">
+      <h3 className="font-semibold text-2xl">Profile</h3>
       <Avatar className="size-20">
         <AvatarImage src={user.image!} />
         <AvatarFallback className="text-2xl">{user.name!.charAt(0).toUpperCase()}</AvatarFallback>
