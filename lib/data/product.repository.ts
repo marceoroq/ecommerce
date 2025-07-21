@@ -4,9 +4,8 @@ import prisma from "@/lib/prisma";
 import { Product as PrismaModel, Prisma } from "@/lib/generated/prisma";
 
 export const ProductRepository = {
-  findAll: async (
-    options?: Prisma.ProductFindManyArgs
-  ): Promise<PrismaModel[]> => await prisma?.product.findMany(options),
+  findAll: async (options?: Prisma.ProductFindManyArgs): Promise<PrismaModel[]> =>
+    await prisma?.product.findMany(options),
 
   findById: async (id: string): Promise<PrismaModel | null> =>
     await prisma.product.findUnique({ where: { id } }),
@@ -14,17 +13,16 @@ export const ProductRepository = {
   findBySlug: async (slug: string): Promise<PrismaModel | null> =>
     await prisma.product.findUnique({ where: { slug } }),
 
+  count: async (options?: Prisma.ProductCountArgs): Promise<number> =>
+    await prisma?.product.count(options),
+
   create: async (data: Prisma.ProductCreateInput): Promise<PrismaModel> =>
     await prisma.product.create({ data }),
 
-  createMany: async (
-    data: Prisma.ProductCreateManyInput[]
-  ): Promise<Prisma.BatchPayload> => await prisma.product.createMany({ data }),
+  createMany: async (data: Prisma.ProductCreateManyInput[]): Promise<Prisma.BatchPayload> =>
+    await prisma.product.createMany({ data }),
 
-  update: async (
-    id: string,
-    data: Prisma.ProductUpdateInput
-  ): Promise<PrismaModel> =>
+  update: async (id: string, data: Prisma.ProductUpdateInput): Promise<PrismaModel> =>
     await prisma.product.update({
       where: { id },
       data,
@@ -33,7 +31,6 @@ export const ProductRepository = {
   delete: async (id: string): Promise<PrismaModel> =>
     await prisma.product.delete({ where: { id } }),
 
-  deleteMany: async (
-    options?: Prisma.ProductDeleteManyArgs
-  ): Promise<Prisma.BatchPayload> => await prisma.product.deleteMany(options),
+  deleteMany: async (options?: Prisma.ProductDeleteManyArgs): Promise<Prisma.BatchPayload> =>
+    await prisma.product.deleteMany(options),
 };

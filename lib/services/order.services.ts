@@ -3,7 +3,9 @@ import "server-only";
 import { UserService } from "@/lib/services/user.services";
 import { CartService } from "@/lib/services/cart.services";
 import { verifySession } from "@/lib/auth/verify-session";
+import { UserRepository } from "@/lib/data/user.repository";
 import { OrderRepository } from "@/lib/data/order.repository";
+import { ProductRepository } from "@/lib/data/product.repository";
 
 import prisma from "@/lib/prisma";
 import { toPlainObject } from "@/lib/utils";
@@ -70,6 +72,34 @@ export const OrderService = {
     return {
       data: orders.map((order) => convertPrismaOrderToPOJO(order)),
       totalCount,
+    };
+  },
+
+  getOrderAdminSummary: async () => {
+    const usersCount = await UserRepository.count();
+    const ordersCount = await OrderRepository.count();
+    const productsCount = await ProductRepository.count();
+
+    // Get latest sales
+    const latestSales = await OrderRepository.findLatestSales();
+
+    // Calculate the total sales
+    const totalRevenue = await OrderRepository.aggregate({ _sum: { totalPrice: true } });
+
+    // Get daily sales
+    const salesByDateData = await OrderRepository.querySalesByDate();
+    const salesByDate = salesByDateData.map((entry) => ({
+      date: entry.date,
+      totalSales: Number(entry.totalSales),
+    }));
+
+    return {
+      usersCount,
+      ordersCount,
+      productsCount,
+      latestSales,
+      totalRevenue,
+      salesByDate,
     };
   },
 

@@ -1,19 +1,30 @@
 import "server-only";
 
 import prisma from "@/lib/prisma";
-import { Order as PrismaModel, OrderItem as PrismaOrderItem, Prisma } from "@/lib/generated/prisma";
+import {
+  Order as PrismaModel,
+  OrderItem as PrismaOrderItem,
+  Prisma,
+  User,
+} from "@/lib/generated/prisma";
 import { OrderItem } from "@/types";
 
 export type OrderWithItems = PrismaModel & {
   OrderItem: PrismaOrderItem[];
 };
 
+export type PrismaSalesByDate = {
+  date: string;
+  totalSales: Prisma.Decimal;
+};
+
+export type OrderWithName = Pick<PrismaModel, "id" | "createdAt" | "totalPrice"> & {
+  user: Pick<User, "name">;
+};
+
 export const OrderRepository = {
   findAll: async (options?: Prisma.OrderFindManyArgs): Promise<PrismaModel[]> =>
     await prisma?.order.findMany(options),
-
-  count: async (options?: Prisma.OrderCountArgs): Promise<number> =>
-    await prisma?.order.count(options),
 
   findById: async <T extends Prisma.OrderFindUniqueArgs>(
     args: Prisma.SelectSubset<T, Prisma.OrderFindUniqueArgs>
@@ -30,6 +41,21 @@ export const OrderRepository = {
       },
     });
   },
+
+  findLatestSales: async (): Promise<OrderWithName[]> =>
+    await prisma.order.findMany({
+      select: {
+        id: true,
+        createdAt: true,
+        totalPrice: true,
+        user: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
+
+  count: async (options?: Prisma.OrderCountArgs): Promise<number> =>
+    await prisma.order.count(options),
 
   create: async (
     data: Omit<Prisma.OrderCreateInput, "user"> & {
@@ -83,4 +109,19 @@ export const OrderRepository = {
 
   deleteMany: async (options?: Prisma.OrderDeleteManyArgs): Promise<Prisma.BatchPayload> =>
     await prisma.order.deleteMany(options),
+
+  aggregate: async (
+    options: Prisma.OrderAggregateArgs
+  ): Promise<Prisma.GetOrderAggregateType<Prisma.OrderAggregateArgs>> =>
+    await prisma.order.aggregate(options),
+
+  querySalesByDate: async (): Promise<PrismaSalesByDate[]> =>
+    await prisma.$queryRaw`
+      SELECT
+        TO_CHAR("createdAt", 'YYYY/MM/DD') as date,
+        SUM("totalPrice") as "totalSales"
+      FROM "Order"
+      GROUP BY date
+      ORDER BY date ASC
+    `,
 };
