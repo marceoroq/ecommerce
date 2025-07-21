@@ -1,14 +1,15 @@
 import { OrderService } from "@/lib/services/order.services";
 
+import { verifySession } from "@/lib/auth/verify-session";
+
+import { Badge } from "@/components/ui/badge";
 import { PayPalPayment } from "@/components/shared/order/paypal-payment";
 import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
+import { Card, CardContent } from "@/components/ui/card";
 import { OrderPricingDetails } from "@/components/shared/order/order-pricing-details";
 import { ShippingAddressDetails } from "@/components/shared/order/shipping-address-details";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 import { ShippingAddress } from "@/types";
-import { verifySession } from "@/lib/auth/verify-session";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -85,7 +86,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           )}
         </OrderPricingDetails>
       </div>
-      <pre>{JSON.stringify(order, null, 2)}</pre>
     </div>
   );
 }
