@@ -1,10 +1,10 @@
-import { verifySession } from "@/lib/auth/verify-session";
+import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 
 export const RequireAdmin = async ({ children }: { children: React.ReactNode }) => {
-  const { isAdmin } = await verifySession();
+  const session = await auth();
 
-  if (!isAdmin) return notFound();
+  if (session?.user.role !== "admin") return notFound();
 
   return <>{children}</>;
 };

@@ -3,6 +3,7 @@ import { User } from "lucide-react";
 import { auth } from "@/lib/auth";
 
 import { Button } from "@/components/ui/button";
+import { OnlyAdmin } from "@/components/shared/auth/only-admin";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -61,7 +62,11 @@ const UserButton = async () => {
           <DropdownMenuItem asChild>
             <Link href="/user/order-history">Order History</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>Admin Panel</DropdownMenuItem>
+          <OnlyAdmin>
+            <DropdownMenuItem>
+              <Link href="/user/overview">Admin Overview</Link>
+            </DropdownMenuItem>
+          </OnlyAdmin>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={signOutAction}>Log out</DropdownMenuItem>
