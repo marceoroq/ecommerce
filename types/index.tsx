@@ -86,3 +86,5 @@ export type PayPalCaptureResponse = {
 
 export type UserProfile = z.infer<typeof updateUserProfileSchema>;
 export type AdminUpdateUser = z.infer<typeof updateUserAsAdminSchema>;
+
+export type UpdateProductForm = z.infer<typeof insertProductSchema>;

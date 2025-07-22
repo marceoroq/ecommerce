@@ -1,10 +1,10 @@
 import "server-only";
 
-import { Product } from "@/types";
 import { toPlainObject } from "@/lib/utils";
 import { ProductRepository } from "@/lib/data/product.repository";
 import { handleRepositoryError } from "@/lib/data/error-handler";
 import { Product as PrismaProduct } from "@/lib/generated/prisma";
+import { Product, UpdateProductForm } from "@/types";
 
 function convertPrismaProductToPOJO(product: PrismaProduct): Product {
   return {
@@ -44,6 +44,22 @@ export const ProductService = {
       return convertPrismaProductToPOJO(product);
     } catch (error) {
       handleRepositoryError(error, "getProductBySlug");
+    }
+  },
+
+  updateProduct: async (id: string, data: UpdateProductForm): Promise<void> => {
+    try {
+      await ProductRepository.update(id, data);
+    } catch (error) {
+      handleRepositoryError(error, "updateProduct");
+    }
+  },
+
+  deleteProduct: async (id: string): Promise<void> => {
+    try {
+      await ProductRepository.delete(id);
+    } catch (error) {
+      handleRepositoryError(error, "deleteProduct");
     }
   },
 };
