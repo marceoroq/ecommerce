@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -76,7 +76,7 @@ export const EditUserButton = ({ user }: { user: PrismaUser }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="size-6" variant="outline">
-          <Edit />
+          <Pencil />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
