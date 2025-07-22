@@ -1,17 +1,21 @@
-import { OrderService } from "@/lib/services/order.services";
+import dateFormat from "dateformat";
 
+import { OrderService } from "@/lib/services/order.services";
 import { verifySession } from "@/lib/auth/verify-session";
 
 import { Badge } from "@/components/ui/badge";
+import { OnlyAdmin } from "@/components/shared/auth/only-admin";
 import { PayPalPayment } from "@/components/shared/order/paypal-payment";
+import { MarkAsPaidButton } from "@/components/shared/order/mark-as-paid-button";
 import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrderPricingDetails } from "@/components/shared/order/order-pricing-details";
+import { MarkAsDeliveredButton } from "@/components/shared/order/mark-as-delivered-button";
 import { ShippingAddressDetails } from "@/components/shared/order/shipping-address-details";
 
 import { ShippingAddress } from "@/types";
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { userId } = await verifySession();
 
@@ -24,9 +28,19 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="flex flex-col gap-4 py-4">
-      <div>
-        <h1 className="h2-bold">Order Details</h1>
-        <span className="text-xs text-foreground/40">ORDER ID: {id}</span>
+      <div className="flex flex-col md:flex-row justify-between gap-2">
+        <div>
+          <h1 className="h2-bold">Order Details</h1>
+          <span className="text-xs text-foreground/40">ORDER ID: {id}</span>
+        </div>
+        <OnlyAdmin>
+          <div className="flex gap-2">
+            {order.paymentMethod === "cash" && (
+              <MarkAsPaidButton orderId={order.id} disabled={order.isPaid} />
+            )}
+            <MarkAsDeliveredButton orderId={order.id} disabled={order.isDelivered} />
+          </div>
+        </OnlyAdmin>
       </div>
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
         <div className="flex flex-col gap-4 md:col-span-2 overflow-x-auto">
@@ -39,7 +53,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     variant="secondary"
                     className="h-5 rounded-full font-normal border-gray-300"
                   >
-                    Paid at {String(order.paidAt)}
+                    Paid at {dateFormat(order.paidAt!, "mmm dd, yyyy HH:MM")} hs.
                   </Badge>
                 ) : (
                   <>
@@ -56,7 +70,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <ShippingAddressDetails address={order.shippingAddress as ShippingAddress}>
             {order.isDelivered ? (
               <Badge variant="secondary" className="h-5 rounded-full font-normal border-gray-300">
-                Delivered at {String(order.deliveredAt)}
+                Delivered at {dateFormat(order.deliveredAt!, "mmm dd, yyyy HH:MM")} hs.
               </Badge>
             ) : (
               <>
@@ -72,6 +86,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
           <OrderItemsDetails orderItems={order.items} />
         </div>
+
         <OrderPricingDetails
           subTotal={Number(order.itemsPrice)}
           taxPrice={Number(order.taxPrice)}

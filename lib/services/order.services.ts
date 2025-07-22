@@ -205,6 +205,20 @@ export const OrderService = {
     return updatedOrder;
   },
 
+  updateOrderToDelivered: async (id: string) => {
+    const order = await OrderRepository.findByIdWithDetails(id);
+    if (!order) throw new Error("Order not found");
+
+    if (order.isDelivered) throw new Error("Order is already delivered");
+
+    const updatedOrder = await OrderRepository.update(id, {
+      isDelivered: true,
+      deliveredAt: new Date(),
+    });
+
+    return updatedOrder;
+  },
+
   deleteOrderById: async (id: string) => {
     await OrderRepository.delete({ where: { id } });
   },

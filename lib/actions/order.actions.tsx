@@ -117,6 +117,38 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
   }
 }
 
+export async function markOrderAsPaid(orderId: string) {
+  try {
+    const order = await OrderService.getOrderById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    await OrderService.updateOrderToPaid(orderId);
+
+    revalidatePath(`/order/${orderId}`);
+
+    return { success: true, message: "The order has been marked as paid" };
+  } catch (error) {
+    console.error("[Mark Order as Paid Action error]", error);
+    return { success: false, message: "Error marking order as paid" };
+  }
+}
+
+export async function markOrderAsDelivered(orderId: string) {
+  try {
+    const order = await OrderService.getOrderById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    await OrderService.updateOrderToDelivered(orderId);
+
+    revalidatePath(`/order/${orderId}`);
+
+    return { success: true, message: "The order has been marked as delivered" };
+  } catch (error) {
+    console.error("[Mark Order as Delivered Action error]", error);
+    return { success: false, message: "Error marking order as delivered" };
+  }
+}
+
 export async function deleteOrderByIdAction(orderId: string) {
   try {
     await OrderService.deleteOrderById(orderId);

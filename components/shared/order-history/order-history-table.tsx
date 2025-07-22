@@ -37,18 +37,26 @@ export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTablePr
         {orderHistory.map((order) => (
           <TableRow key={order.id}>
             <TableCell className="font-medium">{order.id.slice(0, 7)}</TableCell>
-            <TableCell>{dateFormat(order.createdAt)}</TableCell>
+            <TableCell>{dateFormat(order.createdAt, "mmm dd, yyyy HH:MM")}</TableCell>
             <TableCell className="text-center">$ {order.totalPrice}</TableCell>
-            <TableCell>{order.isPaid ? dateFormat(order.paidAt!) : "Not Paid"}</TableCell>
             <TableCell>
-              {order.isDelivered ? dateFormat(order.deliveredAt!) : "Not Delivered"}
+              {order.isPaid ? dateFormat(order.paidAt!, "mmm dd, yyyy HH:MM") : "Not Paid"}
+            </TableCell>
+            <TableCell>
+              {order.isDelivered
+                ? dateFormat(order.deliveredAt!, "mmm dd, yyyy HH:MM")
+                : "Not Delivered"}
             </TableCell>
             {isAdmin ? (
-              <TableCell className="flex justify-center gap-2">
-                <Button className="size-6" variant="outline">
-                  <Pencil />
-                </Button>
-                <DeleteOrderButton orderId={order.id} />
+              <TableCell>
+                <div className="flex justify-center gap-2">
+                  <Button asChild className="size-6" variant="outline">
+                    <Link href={`/order/${order.id}`}>
+                      <Pencil />
+                    </Link>
+                  </Button>
+                  <DeleteOrderButton orderId={order.id} />
+                </div>
               </TableCell>
             ) : (
               <TableCell className="text-right">
