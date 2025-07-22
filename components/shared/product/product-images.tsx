@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { useState } from "react";
+
 import { cn } from "@/lib/utils";
 
-const ProductImages = ({ images }: { images: string[] }) => {
+export const ProductImages = ({ images }: { images: string[] }) => {
   const [current, setCurrent] = useState(0);
 
   return (
@@ -33,5 +34,3 @@ const ProductImages = ({ images }: { images: string[] }) => {
     </div>
   );
 };
-
-export default ProductImages;

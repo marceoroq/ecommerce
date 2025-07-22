@@ -13,11 +13,7 @@ type AddToCartProps = {
   stock: number;
 };
 
-const AddToCart = ({
-  item,
-  quantity: initialQuantity,
-  stock,
-}: AddToCartProps) => {
+export const AddToCart = ({ item, quantity: initialQuantity, stock }: AddToCartProps) => {
   const { quantity, setQuantity, isLoading } = useDebouncedCartQuantity(
     initialQuantity,
     item,
@@ -51,5 +47,3 @@ const AddToCart = ({
     </div>
   );
 };
-
-export default AddToCart;

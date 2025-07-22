@@ -1,9 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { FaStar } from "react-icons/fa6";
 
-import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+
+import { Product } from "@/types";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const hasStock = product.stock > 0;
@@ -23,14 +25,14 @@ const ProductCard = ({ product }: { product: Product }) => {
       </CardHeader>
       <CardContent className="p-4 grid gap-2">
         <div className="font-semibold">{product.brand}</div>
-        <Link
-          className="w-full overflow-hidden"
-          href={`/product/${product.slug}`}
-        >
+        <Link className="w-full overflow-hidden" href={`/product/${product.slug}`}>
           <h2 className="text-sm truncate">{product.name}</h2>
         </Link>
-        <div className="text-xs text-gray-500">
-          {product.rating} ({product.numReviews} Reviews)
+        <div className="flex text-xs text-gray-500 items-center gap-1">
+          <FaStar className="fill-yellow-400 border-yellow-400 inline mb-0.5" />
+          <p>
+            {product.rating} ({product.numReviews} Reviews)
+          </p>
         </div>
         {hasStock ? (
           <div className="font-medium">${Number(product.price).toFixed(2)}</div>
