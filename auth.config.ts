@@ -14,6 +14,7 @@ export const authConfig = {
       // this update is executed when we update name in profile
       if (trigger === "update") {
         token.name = session.user.name;
+        token.role = session.user.role;
       }
 
       if (user) {

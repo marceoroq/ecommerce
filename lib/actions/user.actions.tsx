@@ -4,18 +4,18 @@ import { redirect } from "next/navigation";
 import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
 
+import { UserService } from "@/lib/services/user.services";
 import { signIn, signOut } from "@/lib/auth";
+
+import { AdminUpdateUser, PaymentMethod, ShippingAddress, UserProfile } from "@/types";
 import {
   paymentMethodSchema,
   shippingAddressSchema,
   signInFormSchema,
   signUpFormSchema,
+  updateUserAsAdminSchema,
   updateUserProfileSchema,
 } from "@/lib/validators";
-
-import { UserService } from "@/lib/services/user.services";
-
-import { PaymentMethod, ShippingAddress, UserProfile } from "@/types";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
@@ -150,7 +150,7 @@ export async function updateUserAddressAction(data: ShippingAddress) {
   try {
     const validatedAddress = shippingAddressSchema.parse(data);
 
-    await UserService.updateUser({ address: validatedAddress });
+    await UserService.updateAuthenticatedUser({ address: validatedAddress });
 
     return { success: true, message: "User address updated successfully" };
   } catch (error) {
@@ -162,7 +162,7 @@ export async function updateUserAddressAction(data: ShippingAddress) {
 export async function updateUserPaymentMethodAction(data: PaymentMethod) {
   try {
     const validatedMethod = paymentMethodSchema.parse(data);
-    await UserService.updateUser({ paymentMethod: validatedMethod.type });
+    await UserService.updateAuthenticatedUser({ paymentMethod: validatedMethod.type });
   } catch (error) {
     console.error(`[UPDATE PAYMENT METHOD ACTION ERROR]: ${error}`);
     return { success: false, message: error };
@@ -174,11 +174,37 @@ export async function updateUserPaymentMethodAction(data: PaymentMethod) {
 export async function updateUserName(data: UserProfile) {
   try {
     const validatedUserName = updateUserProfileSchema.parse(data);
-    await UserService.updateUser({ name: validatedUserName.name });
+    await UserService.updateAuthenticatedUser({ name: validatedUserName.name });
 
     return { success: true, message: "Name updated successfully" };
   } catch (error) {
     console.error(`[UPDATE USER NAME ACTION ERROR]: ${error}`);
+    return { success: false, message: String(error) };
+  }
+}
+
+export async function updateUserAction(userId: string, data: AdminUpdateUser) {
+  try {
+    const validatedUser = updateUserAsAdminSchema.parse(data);
+    await UserService.updateUser(userId, {
+      name: validatedUser.name,
+      email: validatedUser.email,
+      role: validatedUser.role,
+    });
+
+    return { success: true, message: "User updated successfully" };
+  } catch (error) {
+    console.error(`[UPDATE USER ACTION ERROR]: ${error}`);
+    return { success: false, message: String(error) };
+  }
+}
+
+export async function deleteUserByIdAction(userId: string) {
+  try {
+    await UserService.deleteUser(userId);
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    console.error(`[DELETE USER ACTION ERROR]: ${error}`);
     return { success: false, message: String(error) };
   }
 }

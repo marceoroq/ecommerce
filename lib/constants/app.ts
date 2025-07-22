@@ -15,3 +15,5 @@ export const PAYMENT_METHODS = ["paypal", "stripe", "cash"];
 export const PAYMENT_METHOD_DEFAULT = "stripe";
 
 export const ORDERS_PAGE_SIZE = 5;
+
+export const VALID_ROLES = ["admin", "user"];

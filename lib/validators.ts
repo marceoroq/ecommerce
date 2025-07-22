@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { PAYMENT_METHODS } from "@/lib/constants";
+import { PAYMENT_METHODS, VALID_ROLES } from "@/lib/constants";
 
 const currencyValidation = z
   .string()
@@ -113,4 +113,12 @@ export const paymentResultSchema = z.object({
 export const updateUserProfileSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   email: z.string().email("Invalid email address"),
+});
+
+export const updateUserAsAdminSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  email: z.string().email("Invalid email address"),
+  role: z.string().refine((value) => VALID_ROLES.includes(value), {
+    message: "Invalid selected role",
+  }),
 });
