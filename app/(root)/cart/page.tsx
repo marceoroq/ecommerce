@@ -24,14 +24,11 @@ export default async function CartPage() {
     <div className="grid grid-cols-1 lg:grid-cols-7">
       {/* Products List */}
       <section
-        className={cn(
-          "flex flex-col min-h-96 p-5",
-          showEmptyState ? "col-span-7" : "col-span-5"
-        )}
+        className={cn("flex flex-col min-h-96 p-5", showEmptyState ? "col-span-7" : "col-span-5")}
       >
         <h1 className="py-4 h2-bold">Shopping Cart</h1>
         {showEmptyState ? (
-          <div className="flex-center flex-grow">Cart is empty</div>
+          <div className="flex-center flex-grow">Your cart is waiting for goodies!</div>
         ) : (
           <CartTable cartItems={cart?.items || []} />
         )}

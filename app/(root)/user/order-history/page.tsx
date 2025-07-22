@@ -19,12 +19,18 @@ export default async function OrderHistoryPage({
   return (
     <div className="flex flex-col gap-4">
       <h3 className="font-semibold text-2xl">Order History</h3>
-      {/* The min-height (in this case min-h-56) depends of the ORDERS_PAGE_SIZE, 
-      the idea of this min height is to keep the pagination buttons in a fix position */}
-      <div className="min-h-56">
-        <OrderHistoryTable isAdmin={isAdmin} orderHistory={orders} />
-      </div>
-      <TablePagination totalItems={totalCount} currentPage={page} className="justify-end" />
+      {orders.length > 0 ? (
+        <>
+          {/* The min-height (in this case min-h-56) depends of the ORDERS_PAGE_SIZE, 
+        the idea of this min height is to keep the pagination buttons in a fix position */}
+          <div className="min-h-56">
+            <OrderHistoryTable isAdmin={isAdmin} orderHistory={orders} />
+          </div>
+          <TablePagination totalItems={totalCount} currentPage={page} className="justify-end" />
+        </>
+      ) : (
+        <p className="text-gray-600">Looks quiet here… Time to place your first order!</p>
+      )}
     </div>
   );
 }
