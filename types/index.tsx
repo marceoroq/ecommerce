@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
   insertCartSchema,
-  insertProductSchema,
   insertCartItemSchema,
   shippingAddressSchema,
   paymentMethodSchema,
@@ -10,9 +9,11 @@ import {
   paymentResultSchema,
   updateUserProfileSchema,
   updateUserAsAdminSchema,
+  createProductSchema,
+  updateProductSchema,
 } from "@/lib/validators";
 
-export type Product = z.infer<typeof insertProductSchema> & {
+export type Product = z.infer<typeof createProductSchema> & {
   id: string;
   rating?: number;
   numReviews?: number;
@@ -87,4 +88,5 @@ export type PayPalCaptureResponse = {
 export type UserProfile = z.infer<typeof updateUserProfileSchema>;
 export type AdminUpdateUser = z.infer<typeof updateUserAsAdminSchema>;
 
-export type UpdateProductForm = z.infer<typeof insertProductSchema>;
+export type UpdateProductForm = z.infer<typeof updateProductSchema>;
+export type AddProductForm = z.infer<typeof createProductSchema>;

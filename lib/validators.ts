@@ -10,7 +10,7 @@ const currencyValidation = z
   );
 
 // Schema for inserting products
-export const insertProductSchema = z.object({
+export const createProductSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   slug: z.string().min(3, "Slug must be at least 3 characters"),
   category: z.string().min(3, "Category must be at least 3 characters"),
@@ -21,6 +21,10 @@ export const insertProductSchema = z.object({
   price: currencyValidation,
   isFeatured: z.boolean(),
   banner: z.string().nullable(),
+});
+
+export const updateProductSchema = createProductSchema.partial().extend({
+  id: z.string().uuid("Invalid product ID format"),
 });
 
 // Schema for sign in form using credentials
@@ -45,7 +49,7 @@ export const insertCartItemSchema = z.object({
   productId: z.string().uuid("Invalid product ID format"),
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
-  image: z.string().min(1, "Image is required"),
+  image: z.string(),
   price: currencyValidation,
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
 });
@@ -82,7 +86,7 @@ export const insertOrderItemSchema = z.object({
   productId: z.string().uuid("Invalid product ID format"),
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
-  image: z.string().min(1, "Image is required"),
+  image: z.string(),
   price: currencyValidation,
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
 });

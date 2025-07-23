@@ -48,13 +48,10 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
       await CartService.createCart(validatedFields);
     } else {
       // If cart exist, verify if the product is in and get it
-      const productInCart = cart.items.find(
-        (item) => item.productId === validatedItem.productId
-      );
+      const productInCart = cart.items.find((item) => item.productId === validatedItem.productId);
 
       // Checks if the quantity to add exceeds the available stock
-      const newItemQuantity =
-        (productInCart?.quantity || 0) + validatedItem.quantity;
+      const newItemQuantity = (productInCart?.quantity || 0) + validatedItem.quantity;
 
       const hasEnoughStock = productInDB.stock >= newItemQuantity;
       if (!hasEnoughStock) throw new Error("PRODUCT_EXCEED_STOCK");
@@ -62,9 +59,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
       if (productInCart) {
         // The product is in the cart, we'll update its quantity.
         const updatedItems = cart.items.map((item) =>
-          item.productId === validatedItem.productId
-            ? { ...item, quantity: newItemQuantity }
-            : item
+          item.productId === validatedItem.productId ? { ...item, quantity: newItemQuantity } : item
         );
 
         await CartService.updateCart(cart.id, {
@@ -119,10 +114,7 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
   }
 }
 
-export async function decreaseCartItemQuantityAction(
-  productId: string,
-  quantityToRemove: number
-) {
+export async function decreaseCartItemQuantityAction(productId: string, quantityToRemove: number) {
   try {
     const cart = await getCurrentCart();
 
@@ -135,13 +127,10 @@ export async function decreaseCartItemQuantityAction(
     // Checks if the current removal operation will result in zero
     // quantity for this product in the cart.
     const willRemoveAllQuantity =
-      cart.items.find((item) => item.productId === productId)?.quantity ===
-      quantityToRemove;
+      cart.items.find((item) => item.productId === productId)?.quantity === quantityToRemove;
 
     if (willRemoveAllQuantity) {
-      const updatedItems = cart.items.filter(
-        (item) => item.productId !== productId
-      );
+      const updatedItems = cart.items.filter((item) => item.productId !== productId);
 
       await CartService.updateCart(cart.id, {
         items: updatedItems,
@@ -176,9 +165,7 @@ export async function removeProductFromCartAction(productId: string) {
       return { success: false, message: "Cart not found" };
     }
 
-    const updatedItems = cart.items.filter(
-      (item) => item.productId !== productId
-    );
+    const updatedItems = cart.items.filter((item) => item.productId !== productId);
 
     await CartService.updateCart(cart.id, {
       items: updatedItems,

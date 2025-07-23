@@ -4,7 +4,7 @@ import { toPlainObject } from "@/lib/utils";
 import { ProductRepository } from "@/lib/data/product.repository";
 import { handleRepositoryError } from "@/lib/data/error-handler";
 import { Product as PrismaProduct } from "@/lib/generated/prisma";
-import { Product, UpdateProductForm } from "@/types";
+import { AddProductForm, Product, UpdateProductForm } from "@/types";
 
 function convertPrismaProductToPOJO(product: PrismaProduct): Product {
   return {
@@ -17,7 +17,7 @@ function convertPrismaProductToPOJO(product: PrismaProduct): Product {
 export const ProductService = {
   getProducts: async (): Promise<Product[]> => {
     try {
-      const products = await ProductRepository.findAll();
+      const products = await ProductRepository.findAll({ orderBy: { createdAt: "desc" } });
 
       return products.map((product) => convertPrismaProductToPOJO(product));
     } catch (error) {
@@ -44,6 +44,14 @@ export const ProductService = {
       return convertPrismaProductToPOJO(product);
     } catch (error) {
       handleRepositoryError(error, "getProductBySlug");
+    }
+  },
+
+  createProduct: async (data: AddProductForm): Promise<void> => {
+    try {
+      await ProductRepository.create(data);
+    } catch (error) {
+      handleRepositoryError(error, "createProduct");
     }
   },
 

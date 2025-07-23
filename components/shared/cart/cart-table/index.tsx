@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { ImageOff } from "lucide-react";
 
 import { CartItem } from "@/types";
 
@@ -14,7 +15,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import TableQuantity from "./table-quantity";
-import { ImageOff } from "lucide-react";
 
 type CartTableProps = {
   cartItems: CartItem[];

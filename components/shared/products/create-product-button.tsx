@@ -1,62 +1,63 @@
 "use client";
 
 import slugify from "slugify";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { Pencil } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, useTransition } from "react";
 
-import { updateProductAction } from "@/lib/actions/product.actions";
+import { createProductAction } from "@/lib/actions/product.actions";
 
-import { Button } from "@/components/ui/button";
+import { CreateProductForm } from "@/components/shared/products/create-product-form";
 import { Spinner } from "@/components/shared/spinner";
-import { EditProductForm } from "@/components/shared/products/edit-product-form";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogTitle,
   DialogClose,
-  DialogFooter,
-  DialogHeader,
-  DialogTrigger,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Product, UpdateProductForm } from "@/types";
-import { updateProductSchema } from "@/lib/validators";
+import { createProductSchema } from "@/lib/validators";
+import { AddProductForm } from "@/types";
 
-export const EditProductButton = ({ product }: { product: Product }) => {
+export const CreateProductButton = () => {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<UpdateProductForm>({
-    resolver: zodResolver(updateProductSchema),
+  const form = useForm<AddProductForm>({
+    resolver: zodResolver(createProductSchema),
     defaultValues: {
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      category: product.category,
-      images: product.images,
-      brand: product.brand,
-      description: product.description,
-      stock: product.stock,
-      price: product.price,
-      isFeatured: product.isFeatured,
-      banner: product.banner,
+      name: "",
+      slug: "",
+      category: "",
+      images: [""],
+      brand: "",
+      description: "",
+      stock: 0,
+      price: "",
+      isFeatured: false,
+      banner: null,
     },
   });
 
-  const name = form.watch("name") || product.name;
+  // Automatically generate and update the slug field based on the current name input,
+  // converting spaces to hyphens and making it lowercase for URL-friendly format.
+  const name = form.watch("name");
   useEffect(() => {
     form.setValue("slug", slugify(name, { lower: true, remove: /[*+~.()'"!:@]/g }));
   }, [name, form]);
 
-  function onSubmit(values: UpdateProductForm) {
+  function onSubmit(values: AddProductForm) {
     startTransition(async () => {
-      const response = await updateProductAction(product.id, values);
+      const response = await createProductAction(values);
 
       if (!response?.success) {
         toast.error(response?.message);
@@ -64,6 +65,7 @@ export const EditProductButton = ({ product }: { product: Product }) => {
         return;
       }
 
+      form.reset();
       toast.success(response?.message);
       router.refresh();
       setOpen(false);
@@ -73,19 +75,20 @@ export const EditProductButton = ({ product }: { product: Product }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="size-6" variant="outline">
-          <Pencil />
+        <Button className="min-w-36" variant="outline">
+          <Plus />
+          Create product
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit product</DialogTitle>
+          <DialogTitle>Create product</DialogTitle>
           <DialogDescription>
-            Edit product information. Click on save when you are done.
+            Complete all the product information. Click on save when you are done.
           </DialogDescription>
         </DialogHeader>
 
-        <EditProductForm form={form} onSubmit={onSubmit} />
+        <CreateProductForm form={form} onSubmit={onSubmit} />
 
         <DialogFooter>
           <DialogClose asChild>
