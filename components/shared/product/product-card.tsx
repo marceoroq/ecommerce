@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaStar } from "react-icons/fa6";
+import { ImageOff } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -11,16 +12,20 @@ const ProductCard = ({ product }: { product: Product }) => {
   const hasStock = product.stock > 0;
 
   return (
-    <Card className="w-full max-w-sm overflow-hidden">
-      <CardHeader className="p-0 items-center">
+    <Card className="w-full max-w-sm justify-between flex flex-col overflow-hidden">
+      <CardHeader className="p-0 flex-1 items-center justify-center">
         <Link href={`/product/${product.slug}`}>
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            height={300}
-            width={300}
-            priority={true}
-          />
+          {product.images[0].length > 0 ? (
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              height={300}
+              width={300}
+              priority={true}
+            />
+          ) : (
+            <ImageOff className="size-24 my-14 text-gray-400" />
+          )}
         </Link>
       </CardHeader>
       <CardContent className="p-4 grid gap-2">

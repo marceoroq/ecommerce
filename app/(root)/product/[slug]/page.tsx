@@ -1,6 +1,7 @@
 import { FaStar } from "react-icons/fa6";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { ImageOff } from "lucide-react";
 
 import { CartService } from "@/lib/services/cart.services";
 import { ProductService } from "@/lib/services/product.services";
@@ -34,15 +35,19 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
     name,
     slug,
     price,
-    image: images![0],
+    image: images[0] || "",
     quantity: 1,
   };
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-5">
       {/* Images Column */}
-      <div className="col-span-2">
-        <ProductImages images={product.images} />
+      <div className="flex justify-center items-center col-span-2">
+        {product.images[0].length > 0 ? (
+          <ProductImages images={product.images} />
+        ) : (
+          <ImageOff className="size-24 text-gray-400" />
+        )}
       </div>
 
       {/* Details Column */}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ImageOff } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -17,10 +18,7 @@ type OrderItemsDetailsProps = {
   orderItems: CartItem[];
 };
 
-export const OrderItemsDetails = ({
-  children,
-  orderItems,
-}: OrderItemsDetailsProps) => {
+export const OrderItemsDetails = ({ children, orderItems }: OrderItemsDetailsProps) => {
   return (
     <Card>
       <CardContent className="p-4 gap-4">
@@ -40,17 +38,18 @@ export const OrderItemsDetails = ({
             {orderItems.map((item) => (
               <TableRow key={item.slug}>
                 <TableCell>
-                  <Link
-                    href={`/product/${item.slug}`}
-                    className="flex gap-2 items-center"
-                  >
-                    <Image
-                      className="rounded-sm"
-                      src={item.image}
-                      alt={`${item.name} image`}
-                      width={50}
-                      height={50}
-                    />
+                  <Link href={`/product/${item.slug}`} className="flex gap-2 items-center">
+                    {item.image ? (
+                      <Image
+                        className="rounded-sm"
+                        src={item.image}
+                        alt={`${item.name} image`}
+                        width={50}
+                        height={50}
+                      />
+                    ) : (
+                      <ImageOff className="size-6 m-3 text-gray-400" />
+                    )}
                     <span className="px-2">{item.name}</span>
                   </Link>
                 </TableCell>

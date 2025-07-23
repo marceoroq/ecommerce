@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import TableQuantity from "./table-quantity";
+import { ImageOff } from "lucide-react";
 
 type CartTableProps = {
   cartItems: CartItem[];
@@ -34,17 +35,18 @@ const CartTable = ({ cartItems }: CartTableProps) => {
         {cartItems.map((item) => (
           <TableRow key={item.productId}>
             <TableCell className="font-medium">
-              <Link
-                href={`/product/${item.slug}`}
-                className="flex items-center gap-2"
-              >
-                <Image
-                  className="rounded-sm"
-                  src={item.image}
-                  alt={`${item.name} image`}
-                  width={90}
-                  height={150}
-                />
+              <Link href={`/product/${item.slug}`} className="flex items-center gap-2">
+                {item.image ? (
+                  <Image
+                    className="rounded-sm"
+                    src={item.image}
+                    alt={`${item.name} image`}
+                    width={90}
+                    height={150}
+                  />
+                ) : (
+                  <ImageOff className="size-10 m-6 text-gray-400" />
+                )}
                 <p>{item.name}</p>
               </Link>
             </TableCell>
