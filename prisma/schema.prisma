@@ -134,7 +134,7 @@ model Order {
 model OrderItem {
   name     String
   slug     String
-  image    String
+  image    String?
   quantity Int
   price    Decimal @db.Decimal(12, 2)
 
