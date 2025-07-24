@@ -1,5 +1,6 @@
 import { DeleteUserButton } from "@/components/shared/users/delete-user-button";
 import { EditUserButton } from "@/components/shared/users/edit-user-button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/table";
 
 import { User as PrismaUser } from "@/lib/generated/prisma";
+import { cn } from "@/lib/utils";
 
 type UsersTableProps = {
   users: PrismaUser[];
@@ -31,7 +33,16 @@ export const UsersTable = ({ users }: UsersTableProps) => {
           <TableRow key={user.id}>
             <TableCell>{user.name}</TableCell>
             <TableCell>{user.email}</TableCell>
-            <TableCell>{user.role}</TableCell>
+            <TableCell>
+              <Badge
+                className={cn(
+                  "capitalize rounded-full font-normal",
+                  user.role === "user" && "bg-foreground/10 text-foreground"
+                )}
+              >
+                {user.role}
+              </Badge>
+            </TableCell>
             <TableCell className="flex gap-2 justify-center">
               <EditUserButton user={user} />
               <DeleteUserButton userId={user.id} />
