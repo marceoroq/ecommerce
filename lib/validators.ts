@@ -49,7 +49,7 @@ export const insertCartItemSchema = z.object({
   productId: z.string().uuid("Invalid product ID format"),
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
-  image: z.string().optional(),
+  image: z.string().optional().nullable(),
   price: currencyValidation,
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
 });
