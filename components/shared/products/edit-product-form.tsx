@@ -3,6 +3,7 @@
 import { DollarSign } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
+import { UploadBannerFieldForm } from "@/components/shared/products/upload-banner-field-form";
 import { UploadImageFieldForm } from "@/components/shared/products/upload-image-field-form";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -147,6 +148,8 @@ export const EditProductForm = ({ form, onSubmit }: ProductFormProps) => {
             )}
           />
         </div>
+
+        {form.getValues("isFeatured") && <UploadBannerFieldForm form={form} />}
       </form>
     </Form>
   );

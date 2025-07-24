@@ -17,7 +17,7 @@ function convertPrismaProductToPOJO(product: PrismaProduct): Product {
 export const ProductService = {
   getProducts: async (): Promise<Product[]> => {
     try {
-      const products = await ProductRepository.findAll({ orderBy: { createdAt: "desc" } });
+      const products = await ProductRepository.findAll({ orderBy: { name: "asc" } });
 
       return products.map((product) => convertPrismaProductToPOJO(product));
     } catch (error) {

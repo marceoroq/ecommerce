@@ -29,6 +29,7 @@ export const UploadImageFieldForm = ({ form }: { form: any }) => {
                       alt={image}
                     />
                     <button
+                      type="button" // this is to avoid capture enter event inside dialog form
                       className="absolute -top-1 bg-background -right-2 border rounded-full"
                       onClick={() =>
                         form.setValue(
