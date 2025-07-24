@@ -43,7 +43,7 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
     <section className="grid grid-cols-1 md:grid-cols-5">
       {/* Images Column */}
       <div className="flex justify-center items-center col-span-2">
-        {product.images[0].length > 0 ? (
+        {product.images.length > 0 ? (
           <ProductImages images={product.images} />
         ) : (
           <ImageOff className="size-24 text-gray-400" />

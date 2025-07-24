@@ -3,6 +3,7 @@
 import { DollarSign } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
+import { UploadImageFieldForm } from "@/components/shared/products/upload-image-field-form";
 import { Input, InputWithIcon } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -124,6 +125,8 @@ export const EditProductForm = ({ form, onSubmit }: ProductFormProps) => {
             </FormItem>
           )}
         />
+
+        <UploadImageFieldForm form={form} />
 
         <div className="grid sm:grid-cols-3 gap-4">
           <FormField

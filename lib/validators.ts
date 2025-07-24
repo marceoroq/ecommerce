@@ -14,7 +14,7 @@ export const createProductSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   slug: z.string().min(3, "Slug must be at least 3 characters"),
   category: z.string().min(3, "Category must be at least 3 characters"),
-  images: z.array(z.string()).min(1, "Product must have at least one image"),
+  images: z.array(z.string()),
   brand: z.string().min(3, "Brand must be at least 3 characters"),
   description: z.string().min(3, "Description must be at least 3 characters"),
   stock: z.coerce.number(),
@@ -49,7 +49,7 @@ export const insertCartItemSchema = z.object({
   productId: z.string().uuid("Invalid product ID format"),
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
-  image: z.string(),
+  image: z.string().optional(),
   price: currencyValidation,
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
 });
@@ -86,7 +86,7 @@ export const insertOrderItemSchema = z.object({
   productId: z.string().uuid("Invalid product ID format"),
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
-  image: z.string(),
+  image: z.string().optional(),
   price: currencyValidation,
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
 });

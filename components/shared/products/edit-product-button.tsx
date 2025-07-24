@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, useTransition } from "react";
 
 import { updateProductAction } from "@/lib/actions/product.actions";
+import { delay } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/shared/spinner";
@@ -39,7 +40,7 @@ export const EditProductButton = ({ product }: { product: Product }) => {
       name: product.name,
       slug: product.slug,
       category: product.category,
-      images: product.images,
+      images: product.images || [],
       brand: product.brand,
       description: product.description,
       stock: product.stock,
@@ -70,14 +71,25 @@ export const EditProductButton = ({ product }: { product: Product }) => {
     });
   }
 
+  async function handleOpenChange(open: boolean) {
+    setOpen(open);
+
+    if (!open) {
+      // The delay is added because the dialog closing involves an animation.
+      // This prevents the form from resetting visibly before the dialog fully closes.
+      await delay(200);
+      form.reset();
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="size-6" variant="outline">
           <Pencil />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-auto">
         <DialogHeader>
           <DialogTitle>Edit product</DialogTitle>
           <DialogDescription>

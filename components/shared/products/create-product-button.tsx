@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState, useTransition } from "react";
 
+import { delay } from "@/lib/utils";
 import { createProductAction } from "@/lib/actions/product.actions";
 
 import { CreateProductForm } from "@/components/shared/products/create-product-form";
@@ -38,7 +39,7 @@ export const CreateProductButton = () => {
       name: "",
       slug: "",
       category: "",
-      images: [""],
+      images: [],
       brand: "",
       description: "",
       stock: 0,
@@ -72,15 +73,26 @@ export const CreateProductButton = () => {
     });
   }
 
+  async function handleOpenChange(open: boolean) {
+    setOpen(open);
+
+    if (!open) {
+      // The delay is added because the dialog closing involves an animation.
+      // This prevents the form from resetting visibly before the dialog fully closes.
+      await delay(200);
+      form.reset();
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="min-w-36" variant="outline">
           <Plus />
           Create product
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-auto">
         <DialogHeader>
           <DialogTitle>Create product</DialogTitle>
           <DialogDescription>

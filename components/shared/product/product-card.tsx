@@ -13,10 +13,11 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <Card className="w-full max-w-sm justify-between flex flex-col overflow-hidden">
-      <CardHeader className="p-0 flex-1 items-center justify-center">
+      <CardHeader className="p-2 flex-1 items-center justify-center">
         <Link href={`/product/${product.slug}`}>
-          {product.images[0].length > 0 ? (
+          {product.images.length > 0 ? (
             <Image
+              className="max-h-56 object-contain"
               src={product.images[0]}
               alt={product.name}
               height={300}
