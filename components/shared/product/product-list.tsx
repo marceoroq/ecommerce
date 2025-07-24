@@ -1,10 +1,10 @@
 import { ProductService } from "@/lib/services/product.services";
 
-import ProductCard from "@/components/shared/product/product-card";
+import { ProductCard } from "@/components/shared/product/product-card";
 
 import { Product } from "@/types";
 
-const ProductList = async () => {
+export const ProductList = async () => {
   const productsList = await ProductService.getProducts();
 
   const limit = 10;
@@ -25,5 +25,3 @@ const ProductList = async () => {
     </>
   );
 };
-
-export default ProductList;

@@ -28,6 +28,20 @@ export const ProductService = {
     }
   },
 
+  getFeaturedProducts: async (): Promise<Product[]> => {
+    try {
+      const products = await ProductRepository.findAll({
+        where: { isFeatured: true },
+        orderBy: { createdAt: "desc" },
+        take: 4,
+      });
+
+      return products.map((product) => convertPrismaProductToPOJO(product));
+    } catch (error) {
+      handleRepositoryError(error, "getFeaturedProducts");
+    }
+  },
+
   getProductById: async (id: string): Promise<Product | null> => {
     try {
       const product = await ProductRepository.findById(id);

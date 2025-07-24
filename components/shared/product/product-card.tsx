@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import { Product } from "@/types";
 
-const ProductCard = ({ product }: { product: Product }) => {
+export const ProductCard = ({ product }: { product: Product }) => {
   const hasStock = product.stock > 0;
 
   return (
@@ -51,5 +51,3 @@ const ProductCard = ({ product }: { product: Product }) => {
     </Card>
   );
 };
-
-export default ProductCard;
