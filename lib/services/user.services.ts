@@ -6,8 +6,11 @@ import { verifySession } from "@/lib/auth/verify-session";
 import { auth } from "@/lib/auth";
 
 export const UserService = {
-  getAllUsers: async (): Promise<PrismaModel[]> => {
-    return await UserRepository.findAll();
+  getAllUsers: async (searchTerm?: string): Promise<PrismaModel[]> => {
+    return await UserRepository.findAll({
+      where: { name: { contains: searchTerm, mode: "insensitive" } },
+      orderBy: { name: "asc" },
+    });
   },
 
   getAuthenticatedUserId: async (): Promise<string | undefined> => {

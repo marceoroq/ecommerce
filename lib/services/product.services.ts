@@ -15,9 +15,12 @@ function convertPrismaProductToPOJO(product: PrismaProduct): Product {
 }
 
 export const ProductService = {
-  getProducts: async (): Promise<Product[]> => {
+  getProducts: async (searchTerm?: string): Promise<Product[]> => {
     try {
-      const products = await ProductRepository.findAll({ orderBy: { name: "asc" } });
+      const products = await ProductRepository.findAll({
+        where: { name: { contains: searchTerm, mode: "insensitive" } },
+        orderBy: { name: "asc" },
+      });
 
       return products.map((product) => convertPrismaProductToPOJO(product));
     } catch (error) {
