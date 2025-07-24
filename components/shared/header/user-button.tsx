@@ -18,7 +18,7 @@ import {
 
 import { signOutAction } from "@/lib/actions/user.actions";
 
-const UserButton = async () => {
+export const UserButton = async () => {
   const session = await auth();
 
   if (!session) {
@@ -74,5 +74,3 @@ const UserButton = async () => {
     </DropdownMenu>
   );
 };
-
-export default UserButton;

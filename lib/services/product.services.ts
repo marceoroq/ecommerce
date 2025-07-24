@@ -73,4 +73,17 @@ export const ProductService = {
       handleRepositoryError(error, "deleteProduct");
     }
   },
+
+  getAllCategories: async (): Promise<string[]> => {
+    try {
+      const categories = await ProductRepository.findAll({
+        select: { category: true },
+        distinct: ["category"],
+      });
+
+      return categories.map((category) => category.category);
+    } catch (error) {
+      handleRepositoryError(error, "getAllCategories");
+    }
+  },
 };

@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ModeToggle() {
+export const ModeToggle = () => {
   const { setTheme, theme } = useTheme();
 
   return (
@@ -33,27 +33,16 @@ export function ModeToggle() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Appearance</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuCheckboxItem
-          checked={theme === "light"}
-          onClick={() => setTheme("light")}
-        >
+        <DropdownMenuCheckboxItem checked={theme === "light"} onClick={() => setTheme("light")}>
           Light
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={theme === "dark"}
-          onClick={() => setTheme("dark")}
-        >
+        <DropdownMenuCheckboxItem checked={theme === "dark"} onClick={() => setTheme("dark")}>
           Dark
         </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={theme === "system"}
-          onClick={() => setTheme("system")}
-        >
+        <DropdownMenuCheckboxItem checked={theme === "system"} onClick={() => setTheme("system")}>
           System
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
-export default ModeToggle;
+};

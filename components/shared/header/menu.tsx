@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { PanelRightOpen, ShoppingBag } from "lucide-react";
 
-import CartBadge from "@/components/shared/header/cart-badge";
-import UserButton from "@/components/shared/header/user-button";
-import ModeToggle from "@/components/shared/header/mode-toggle";
+import { CartService } from "@/lib/services/cart.services";
+
+import { SearchBar } from "@/components/shared/header/search-bar";
+import { UserButton } from "@/components/shared/header/user-button";
+import { ModeToggle } from "@/components/shared/header/mode-toggle";
+import { CartBadge } from "@/components/shared/header/cart-badge";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,8 +16,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { CartService } from "@/lib/services/cart.services";
-import { cookies } from "next/headers";
 
 const Menu = async () => {
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
@@ -42,8 +44,11 @@ const Menu = async () => {
           <SheetTrigger className="align-middle">
             <PanelRightOpen />
           </SheetTrigger>
-          <SheetContent className="flex flex-col items-start">
+          <SheetContent className="flex flex-col items-start gap-4">
             <SheetTitle>Menu</SheetTitle>
+            <div className="w-full">
+              <SearchBar />
+            </div>
             <ModeToggle />
             <Button asChild variant="ghost">
               <Link href="/cart">

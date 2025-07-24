@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 
-const CartBadge = ({ hasItems: initialHasItems }: { hasItems: boolean }) => {
+export const CartBadge = ({ hasItems: initialHasItems }: { hasItems: boolean }) => {
   const [hasItems, setHasItems] = useState(initialHasItems);
   const router = useRouter();
   const pathname = usePathname();
@@ -28,5 +28,3 @@ const CartBadge = ({ hasItems: initialHasItems }: { hasItems: boolean }) => {
     />
   );
 };
-
-export default CartBadge;
