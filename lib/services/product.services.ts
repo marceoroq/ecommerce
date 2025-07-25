@@ -14,12 +14,49 @@ function convertPrismaProductToPOJO(product: PrismaProduct): Product {
   };
 }
 
+interface ProductFilters {
+  searchTerm?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  sortBy?: "newest" | "lowest" | "highest" | "rating";
+}
+
 export const ProductService = {
-  getProducts: async (searchTerm?: string): Promise<Product[]> => {
+  getProducts: async (filters: ProductFilters = {}): Promise<Product[]> => {
     try {
+      const { searchTerm, category, minPrice, maxPrice, minRating, sortBy } = filters;
+
+      // Build orderBy clause
+      let orderBy: Record<string, string> = { name: "asc" }; // default
+
+      switch (sortBy) {
+        case "newest":
+          orderBy = { createdAt: "desc" };
+          break;
+        case "lowest":
+          orderBy = { price: "asc" };
+          break;
+        case "highest":
+          orderBy = { price: "desc" };
+          break;
+        case "rating":
+          orderBy = { rating: "desc" };
+          break;
+      }
+
       const products = await ProductRepository.findAll({
-        where: { name: { contains: searchTerm, mode: "insensitive" } },
-        orderBy: { name: "asc" },
+        where: {
+          name: { contains: searchTerm, mode: "insensitive" as const },
+          rating: { gte: minRating },
+          category: category,
+          price: {
+            gte: minPrice,
+            lte: maxPrice,
+          },
+        },
+        orderBy,
       });
 
       return products.map((product) => convertPrismaProductToPOJO(product));
