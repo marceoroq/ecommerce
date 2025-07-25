@@ -10,7 +10,7 @@ export default async function ProductsPage({
   searchParams?: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchTerm = (await searchParams)?.search;
-  const products = await ProductService.getProducts(searchTerm);
+  const products = await ProductService.getProducts({ searchTerm });
 
   return (
     <div className="flex flex-col gap-4">
