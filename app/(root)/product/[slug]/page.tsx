@@ -5,6 +5,7 @@ import { ImageOff } from "lucide-react";
 
 import { auth } from "@/lib/auth";
 import { CartService } from "@/lib/services/cart.services";
+import { ReviewService } from "@/lib/services/review.service";
 import { ProductService } from "@/lib/services/product.services";
 
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,8 @@ import { AddToCart } from "@/components/shared/product/add-to-cart";
 import { ReviewList } from "@/components/shared/reviews/review-list";
 import { ProductImages } from "@/components/shared/product/product-images";
 import { Card, CardContent } from "@/components/ui/card";
+
+import { Review } from "@/types";
 
 interface ProductDetailsPageProps {
   params: Promise<{ slug: string }>;
@@ -46,6 +49,9 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
     image: images[0] || "",
     quantity: 1,
   };
+
+  // Get reviews
+  const reviews = (await ReviewService.getAllByProductId(product.id)) as Review[];
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-5">
@@ -113,7 +119,9 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
       {/* Reviews Section */}
       <div className="col-span-1 md:col-span-5 py-5">
         <ReviewList
+          reviews={reviews}
           isAdmin={isAdmin}
+          productId={product.id}
           currentUserId={currentUserId}
           isAuthenticated={isAuthenticated}
         />

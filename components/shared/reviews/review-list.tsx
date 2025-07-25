@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import { User } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 import { cn } from "@/lib/utils";
+import { REVIEWS_PER_PAGE } from "@/lib/constants";
+import { deleteReviewAction } from "@/lib/actions/review.actions";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ReviewCard } from "@/components/shared/reviews/review-card";
 import { Card, CardContent } from "@/components/ui/card";
+import { ReviewCreateForm } from "@/components/shared/reviews/review-create-form";
+import { ReviewCard } from "@/components/shared/reviews/review-card";
+import { Spinner } from "@/components/shared/spinner";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -20,109 +26,19 @@ import {
 
 import { Review } from "@/types";
 
-// Mock data for reviews
-const mockReviews: (Review & { user: { name: string; image?: string } })[] = [
-  {
-    id: "1",
-    rating: 5,
-    title: "Excellent product!",
-    comment: "This product exceeded my expectations. Great quality and fast delivery.",
-    userId: "user-1",
-    productId: "product-1",
-    createdAt: new Date("2025-07-15"),
-    updatedAt: new Date("2025-07-15"),
-    user: { name: "John Doe", image: "/images/user1.jpg" },
-  },
-  {
-    id: "2",
-    rating: 4,
-    title: "Good value for money",
-    comment: "Nice product, good quality. Delivery was a bit slow but overall satisfied.",
-    userId: "user-2",
-    productId: "product-1",
-    createdAt: new Date("2025-07-10"),
-    updatedAt: new Date("2025-07-10"),
-    user: { name: "Jane Smith" },
-  },
-  {
-    id: "3",
-    rating: 3,
-    title: "Average product",
-    comment: "It's okay, nothing special. Does what it's supposed to do.",
-    userId: "user-3",
-    productId: "product-1",
-    createdAt: new Date("2025-05-08"),
-    updatedAt: new Date("2025-05-08"),
-    user: { name: "Mike Johnson" },
-  },
-  {
-    id: "4",
-    rating: 5,
-    title: "Amazing quality!",
-    comment: "Best purchase I've made this year. Highly recommend to everyone!",
-    userId: "user-4",
-    productId: "product-1",
-    createdAt: new Date("2025-01-05"),
-    updatedAt: new Date("2025-01-05"),
-    user: { name: "Sarah Wilson" },
-  },
-  {
-    id: "5",
-    rating: 2,
-    title: "Not what I expected",
-    comment: "The product quality is below average. Would not recommend.",
-    userId: "user-5",
-    productId: "product-1",
-    createdAt: new Date("2024-01-03"),
-    updatedAt: new Date("2024-01-03"),
-    user: { name: "Tom Brown" },
-  },
-  {
-    id: "6",
-    rating: 4,
-    title: "Pretty good",
-    comment: "Good product overall. Some minor issues but nothing major.",
-    userId: "8c2dc017-3e3d-4fcb-bcb3-9cc7e84cfdf0",
-    productId: "product-1",
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    user: { name: "Lisa Davis" },
-  },
-  {
-    id: "7",
-    rating: 5,
-    title: "Perfect!",
-    comment: "Exactly what I was looking for. Fast shipping and great customer service.",
-    userId: "user-7",
-    productId: "product-1",
-    createdAt: new Date("2023-12-28"),
-    updatedAt: new Date("2023-12-28"),
-    user: { name: "David Miller" },
-  },
-  {
-    id: "8",
-    rating: 3,
-    title: "Decent product",
-    comment: "It's fine for the price. Nothing extraordinary but does the job.",
-    userId: "user-8",
-    productId: "product-1",
-    createdAt: new Date("2023-12-25"),
-    updatedAt: new Date("2023-12-25"),
-    user: { name: "Emma Garcia" },
-  },
-];
-
 type ReviewListProps = {
   className?: string;
+  productId: string;
+  reviews: Review[];
   currentUserId?: string;
   isAdmin?: boolean;
   isAuthenticated?: boolean;
 };
 
-const REVIEWS_PER_PAGE = 5;
-
 export const ReviewList = ({
   className = "",
+  reviews,
+  productId,
   currentUserId,
   isAdmin = false,
   isAuthenticated = false,
@@ -130,9 +46,11 @@ export const ReviewList = ({
   const [visibleReviews, setVisibleReviews] = useState(REVIEWS_PER_PAGE);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   // Sort reviews: current user's review first, then by date
-  const sortedReviews = mockReviews.sort((a, b) => {
+  const sortedReviews = reviews.sort((a, b) => {
     if (currentUserId) {
       if (a.userId === currentUserId && b.userId !== currentUserId) return -1;
       if (a.userId !== currentUserId && b.userId === currentUserId) return 1;
@@ -155,10 +73,20 @@ export const ReviewList = ({
   };
 
   const handleDeleteConfirm = () => {
-    // Here you would call the delete API
-    console.log(`Deleting review: ${reviewToDelete}`);
-    setDeleteDialogOpen(false);
-    setReviewToDelete(null);
+    startTransition(async () => {
+      if (!reviewToDelete) return;
+
+      const response = await deleteReviewAction(reviewToDelete);
+      if (!response.success) {
+        toast.error(response.message);
+      }
+
+      toast.success(response.message);
+      setDeleteDialogOpen(false);
+      setReviewToDelete(null);
+
+      router.refresh();
+    });
   };
 
   return (
@@ -186,25 +114,18 @@ export const ReviewList = ({
       {isAuthenticated && !userHasReview && (
         <Card className="border-dashed">
           <CardContent className="flex items-center justify-center py-6">
-            <div className="text-center flex flex-col gap-2">
-              <p className="text-muted-foreground">You haven&apos;t reviewed this product yet</p>
-              <Button variant="outline" size="sm">
-                Write a Review
-              </Button>
-            </div>
+            <ReviewCreateForm productId={productId} />
           </CardContent>
         </Card>
       )}
 
       {sortedReviews.length === 0 ? (
-        <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="text-center flex flex-col gap-2">
-              <p className="text-muted-foreground text-lg">No reviews yet</p>
-              <p className="text-sm text-muted-foreground">Be the first to review this product!</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-center py-10">
+          <div className="text-center flex flex-col gap-2">
+            <p className="text-muted-foreground text-lg">No reviews yet</p>
+            <p className="text-sm text-muted-foreground">Be the first to review this product!</p>
+          </div>
+        </div>
       ) : (
         <div className="flex flex-col gap-4">
           {displayedReviews.map((review) => (
@@ -239,8 +160,8 @@ export const ReviewList = ({
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
-              Delete Review
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={isPending}>
+              {isPending ? <Spinner /> : "Delete Review"}
             </Button>
           </DialogFooter>
         </DialogContent>
