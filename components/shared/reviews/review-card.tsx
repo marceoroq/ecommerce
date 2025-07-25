@@ -1,13 +1,13 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { FaStar } from "react-icons/fa6";
 import { formatDistanceToNow } from "date-fns";
 
 import { cn } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ReviewRating } from "@/components/shared/reviews/review-rating";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -28,22 +28,6 @@ export const ReviewCard = ({
   isAdmin = false,
   onDelete,
 }: ReviewCardProps) => {
-  const renderStars = (rating: number) => {
-    return (
-      <div className="flex items-center gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <FaStar
-            key={star}
-            className={cn(
-              "h-4 w-4",
-              star <= rating ? "text-yellow-400 fill-current" : "text-gray-300 dark:text-gray-600"
-            )}
-          />
-        ))}
-      </div>
-    );
-  };
-
   const canDeleteReview = () => {
     return isAdmin || (currentUserId && review.userId === currentUserId);
   };
@@ -81,7 +65,7 @@ export const ReviewCard = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {renderStars(review.rating)}
+                <ReviewRating rating={review.rating} />
                 <span className="text-sm text-muted-foreground">
                   {formatDistanceToNow(review.createdAt, { addSuffix: true })}
                 </span>
