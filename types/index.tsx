@@ -99,4 +99,8 @@ export type Review = CreateReviewForm & {
   productId: string;
   createdAt: Date;
   updatedAt: Date;
+  user: {
+    name: string;
+    image?: string;
+  };
 };
