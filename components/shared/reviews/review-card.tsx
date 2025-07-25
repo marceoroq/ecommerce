@@ -1,6 +1,7 @@
 "use client";
 
-import { FaStar, FaTrash } from "react-icons/fa6";
+import { Trash2 } from "lucide-react";
+import { FaStar } from "react-icons/fa6";
 import { formatDistanceToNow } from "date-fns";
 
 import { cn } from "@/lib/utils";
@@ -35,7 +36,7 @@ export const ReviewCard = ({
             key={star}
             className={cn(
               "h-4 w-4",
-              star <= rating ? "text-yellow-400 fill-current" : "text-gray-300"
+              star <= rating ? "text-yellow-400 fill-current" : "text-gray-300 dark:text-gray-600"
             )}
           />
         ))}
@@ -89,12 +90,11 @@ export const ReviewCard = ({
           </div>
           {canDeleteReview() && (
             <Button
-              variant="ghost"
-              size="sm"
+              variant="outline"
               onClick={() => onDelete(review.id)}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive hover:text-destructive hover:border-destructive hover:bg-destructive/10 dark:text-red-400 dark:hover:text-red-300 dark:hover:border-red-400 dark:hover:bg-red-400/10"
             >
-              <FaTrash className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" /> Delete
             </Button>
           )}
         </div>
