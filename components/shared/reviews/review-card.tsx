@@ -54,7 +54,7 @@ export const ReviewCard = ({
     <Card
       className={cn(
         "transition-all duration-200 hover:shadow-md",
-        isCurrentUserReview && "ring-2 ring-primary/20 bg-primary/5",
+        isCurrentUserReview && "ring-2 ring-yellow-600/40 bg-yellow-600/10",
         className
       )}
     >
@@ -63,7 +63,7 @@ export const ReviewCard = ({
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10">
               <AvatarImage src={review.user.image} alt={review.user.name} />
-              <AvatarFallback>
+              <AvatarFallback className={cn(isCurrentUserReview && "bg-yellow-500")}>
                 {review.user.name
                   .split(" ")
                   .map((n) => n[0])
@@ -75,7 +75,7 @@ export const ReviewCard = ({
               <div className="flex items-center gap-2">
                 <p className="font-semibold text-sm">{review.user.name}</p>
                 {isCurrentUserReview && (
-                  <Badge variant="outline" className="text-xs px-2 py-0">
+                  <Badge variant="secondary" className="text-xs bg-gray-600 text-white px-2 py-0">
                     Your Review
                   </Badge>
                 )}

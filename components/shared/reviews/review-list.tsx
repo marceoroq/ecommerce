@@ -82,7 +82,7 @@ const mockReviews: (Review & { user: { name: string; image?: string } })[] = [
     rating: 4,
     title: "Pretty good",
     comment: "Good product overall. Some minor issues but nothing major.",
-    userId: "user-6",
+    userId: "8c2dc017-3e3d-4fcb-bcb3-9cc7e84cfdf0",
     productId: "product-1",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
