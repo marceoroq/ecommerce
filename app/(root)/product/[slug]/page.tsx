@@ -3,11 +3,13 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { ImageOff } from "lucide-react";
 
+import { auth } from "@/lib/auth";
 import { CartService } from "@/lib/services/cart.services";
 import { ProductService } from "@/lib/services/product.services";
 
 import { Badge } from "@/components/ui/badge";
 import { AddToCart } from "@/components/shared/product/add-to-cart";
+import { ReviewList } from "@/components/shared/reviews/review-list";
 import { ProductImages } from "@/components/shared/product/product-images";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -22,6 +24,12 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
   if (!product) {
     notFound();
   }
+
+  // Get authentication info
+  const session = await auth();
+  const isAdmin = session?.user?.role === "admin";
+  const currentUserId = session?.user?.id;
+  const isAuthenticated = !!session;
 
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
   const cartItemQuantity = await CartService.getCartItemQuantity(product.id, sessionCartId);
@@ -42,7 +50,7 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
   return (
     <section className="grid grid-cols-1 md:grid-cols-5">
       {/* Images Column */}
-      <div className="flex justify-center items-center col-span-2">
+      <div className="col-span-1 md:col-span-2 flex justify-center items-center">
         {product.images.length > 0 ? (
           <ProductImages images={product.images} />
         ) : (
@@ -51,7 +59,7 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
       </div>
 
       {/* Details Column */}
-      <div className="col-span-2 p-5">
+      <div className="col-span-1 md:col-span-2 p-5">
         <div className="flex flex-col gap-6">
           <p>
             {product.brand} {product.category}
@@ -66,7 +74,7 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
             </div>
           )}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="font-medium text-2xl">${Number(product.price).toFixed(2)}</div>
+            <div className="font-medium text-2xl">${product.price}</div>
           </div>
         </div>
         <div className="mt-6">
@@ -76,7 +84,7 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
       </div>
 
       {/* Action Column */}
-      <div>
+      <div className="col-span-1 md:col-span-1">
         <Card>
           <CardContent className="p-4">
             <div className="mb-2 flex justify-between">
@@ -100,6 +108,15 @@ export default async function ProductDetailsPage({ params }: ProductDetailsPageP
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="col-span-1 md:col-span-5 py-5">
+        <ReviewList
+          isAdmin={isAdmin}
+          currentUserId={currentUserId}
+          isAuthenticated={isAuthenticated}
+        />
       </div>
     </section>
   );

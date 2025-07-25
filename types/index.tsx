@@ -11,6 +11,7 @@ import {
   updateUserAsAdminSchema,
   createProductSchema,
   updateProductSchema,
+  createReviewSchema,
 } from "@/lib/validators";
 
 export type Product = z.infer<typeof createProductSchema> & {
@@ -90,3 +91,12 @@ export type AdminUpdateUser = z.infer<typeof updateUserAsAdminSchema>;
 
 export type UpdateProductForm = z.infer<typeof updateProductSchema>;
 export type AddProductForm = z.infer<typeof createProductSchema>;
+
+export type CreateReviewForm = z.infer<typeof createReviewSchema>;
+export type Review = CreateReviewForm & {
+  id: string;
+  userId: string;
+  productId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};

@@ -32,6 +32,7 @@ model Product {
   createdAt   DateTime    @default(now()) @db.Timestamp(6)
   updateAt    DateTime    @updatedAt @db.Timestamp(6)
   OrderItem   OrderItem[]
+  Review      Review[]
 }
 
 // Prisma User Model for Auth
@@ -46,11 +47,12 @@ model User {
 
   // Custom fields
   password      String?
-  role          String  @default("user")
-  address       Json?   @db.Json
+  role          String   @default("user")
+  address       Json?    @db.Json
   paymentMethod String?
   Cart          Cart?
   Order         Order[]
+  Review        Review[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -145,4 +147,19 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([orderId, productId], map: "order_item_idx")
+}
+
+model Review {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title   String
+  comment String
+  rating  Int
+
+  userId    String  @db.Uuid
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String  @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

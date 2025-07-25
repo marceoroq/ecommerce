@@ -126,3 +126,9 @@ export const updateUserAsAdminSchema = z.object({
     message: "Invalid selected role",
   }),
 });
+
+export const createReviewSchema = z.object({
+  rating: z.coerce.number().int().min(1).max(5),
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  comment: z.string().min(3, "Comment must be at least 3 characters"),
+});
