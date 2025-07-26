@@ -7,8 +7,10 @@ export const ProductRepository = {
   findAll: async (options?: Prisma.ProductFindManyArgs): Promise<PrismaModel[]> =>
     await prisma?.product.findMany(options),
 
-  findById: async (id: string): Promise<PrismaModel | null> =>
-    await prisma.product.findUnique({ where: { id } }),
+  findById: async (
+    id: string,
+    options?: Omit<Prisma.ProductFindUniqueArgs, "where">
+  ): Promise<PrismaModel | null> => await prisma.product.findUnique({ where: { id }, ...options }),
 
   findBySlug: async (slug: string): Promise<PrismaModel | null> =>
     await prisma.product.findUnique({ where: { slug } }),

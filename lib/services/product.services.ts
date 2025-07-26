@@ -90,6 +90,25 @@ export const ProductService = {
     }
   },
 
+  getRatingAndNumReviewsById: async (
+    id: string
+  ): Promise<{ rating: number; numReviews: number } | null> => {
+    try {
+      const data = await ProductRepository.findById(id, {
+        select: { rating: true, numReviews: true },
+      });
+
+      if (!data) return null;
+
+      return {
+        rating: data.rating.toNumber() || 0,
+        numReviews: data.numReviews || 0,
+      };
+    } catch (error) {
+      handleRepositoryError(error, "getProductById");
+    }
+  },
+
   getProductBySlug: async (slug: string): Promise<Product | null> => {
     try {
       const product = await ProductRepository.findBySlug(slug);

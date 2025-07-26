@@ -25,11 +25,7 @@ export async function createReviewAction(productId: string, values: CreateReview
     }
 
     // Create new review
-    await ReviewService.create({
-      ...validatedFields,
-      user: { connect: { id: userId } },
-      product: { connect: { id: productId } },
-    });
+    await ReviewService.create(userId, productId, validatedFields);
 
     // Revalidate product page to show new review
     revalidatePath(`/product/${productId}`);
