@@ -1,14 +1,15 @@
 "use client";
 
+import { toast } from "sonner";
 import {
   PayPalButtons,
   PayPalScriptProvider,
   ReactPayPalScriptOptions,
 } from "@paypal/react-paypal-js";
 
-import { PayPalLoadingStatus } from "./paypal-loading-status";
 import { approvePayPalOrder, createPayPalOrder } from "@/lib/actions/order.actions";
-import { toast } from "sonner";
+
+import { PayPalLoadingStatus } from "@/components/shared/paypal/paypal-loading-status";
 
 type PayPalPaymentProps = {
   orderId: string;

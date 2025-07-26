@@ -5,7 +5,7 @@ import { verifySession } from "@/lib/auth/verify-session";
 
 import { Badge } from "@/components/ui/badge";
 import { OnlyAdmin } from "@/components/shared/auth/only-admin";
-import { PayPalPayment } from "@/components/shared/order/paypal-payment";
+import { PayPalPayment } from "@/components/shared/paypal/paypal-payment";
 import { MarkAsPaidButton } from "@/components/shared/order/mark-as-paid-button";
 import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
 import { Card, CardContent } from "@/components/ui/card";
