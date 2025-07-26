@@ -14,10 +14,19 @@ import {
 } from "@/components/ui/table";
 
 import { Order } from "@/types";
+import { FaMoneyBillWave, FaRegCreditCard } from "react-icons/fa6";
+import { SiPaypal } from "react-icons/si";
+import React from "react";
 
 type OrderHistoryTableProps = {
   isAdmin: boolean;
   orderHistory: Order[];
+};
+
+const PaymentIcon: Record<string, React.ReactNode> = {
+  stripe: <FaRegCreditCard />,
+  cash: <FaMoneyBillWave />,
+  paypal: <SiPaypal />,
 };
 
 export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTableProps) => {
@@ -28,7 +37,7 @@ export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTablePr
           <TableHead>ID</TableHead>
           <TableHead>Created</TableHead>
           <TableHead className="text-center">Total</TableHead>
-          <TableHead>Paid</TableHead>
+          <TableHead className="text-center">Paid</TableHead>
           <TableHead>Delivered</TableHead>
           <TableHead className="text-center">Actions</TableHead>
         </TableRow>
@@ -40,7 +49,13 @@ export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTablePr
             <TableCell>{dateFormat(order.createdAt, "mmm dd, yyyy HH:MM")}</TableCell>
             <TableCell className="text-center">$ {order.totalPrice}</TableCell>
             <TableCell>
-              {order.isPaid ? dateFormat(order.paidAt!, "mmm dd, yyyy HH:MM") : "Not Paid"}
+              {order.isPaid ? (
+                dateFormat(order.paidAt!, "mmm dd, yyyy HH:MM")
+              ) : (
+                <div className="flex gap-1 items-center justify-center">
+                  {PaymentIcon[order.paymentMethod]} {"Not paid"}
+                </div>
+              )}
             </TableCell>
             <TableCell>
               {order.isDelivered
