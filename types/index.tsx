@@ -47,6 +47,7 @@ export type Order = z.infer<typeof insertOrderSchema> & {
   paidAt: Date | null;
   deliveredAt: Date | null;
   paypalResult: PaypalResult | null;
+  stripePaymentIntentId?: string | null;
   createdAt: Date;
   updatedAt: Date;
   // user: {name: string, email: string}
