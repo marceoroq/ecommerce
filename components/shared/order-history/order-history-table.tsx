@@ -48,7 +48,7 @@ export const OrderHistoryTable = ({ isAdmin, orderHistory }: OrderHistoryTablePr
             <TableCell className="font-medium">{order.id.slice(0, 7)}</TableCell>
             <TableCell>{dateFormat(order.createdAt, "mmm dd, yyyy HH:MM")}</TableCell>
             <TableCell className="text-center">$ {order.totalPrice}</TableCell>
-            <TableCell>
+            <TableCell className="text-center">
               {order.isPaid ? (
                 dateFormat(order.paidAt!, "mmm dd, yyyy HH:MM")
               ) : (
