@@ -19,3 +19,5 @@ export const ORDERS_PAGE_SIZE = 5;
 export const VALID_ROLES = ["admin", "user"];
 
 export const REVIEWS_PER_PAGE = 5;
+
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || "onboarding@resend.dev";
