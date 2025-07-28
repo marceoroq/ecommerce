@@ -102,7 +102,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
 
           {/* Stripe Payment */}
           {!order.isPaid && order.paymentMethod === "stripe" && (
-            <StripePayment amount={order.itemsPrice} orderId={order.id} />
+            <StripePayment amount={order.totalPrice} orderId={order.id} />
           )}
         </OrderPricingDetails>
       </div>
