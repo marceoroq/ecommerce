@@ -16,4 +16,12 @@ export const StripeService = {
         orderId,
       },
     }),
+
+  updatePaymentIntent: async (paymentIntentId: string, amount: number, orderId: string) =>
+    await paymentIntents.update(paymentIntentId, {
+      amount,
+      metadata: {
+        orderId,
+      },
+    }),
 };

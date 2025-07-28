@@ -133,6 +133,13 @@ export async function createStripePaymentIntentAction(amount: number, orderId: s
         throw new Error("Payment Intent already processed");
       }
 
+      // TEMPORARY: This validation and update is only for reusing test transactions
+      // TODO: When paymentIntent.metadata.orderId doesn't match the orderId in database,
+      // we should implement proper error handling or recovery mechanism
+      if (paymentIntent.amount !== amount || paymentIntent.metadata.orderId !== orderId) {
+        await StripeService.updatePaymentIntent(order.stripePaymentIntentId, amount, orderId);
+      }
+
       return {
         success: true,
         message: "Stripe Payment Intent Created Successfully",
