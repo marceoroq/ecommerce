@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
 
   switch (event.type) {
     case "payment_intent.succeeded":
+      // TODO: check before if order is already paid
       await OrderService.updateOrderToPaid(orderId);
       break;
     case "payment_intent.canceled":
