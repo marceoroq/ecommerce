@@ -6,6 +6,7 @@ import { verifySession } from "@/lib/auth/verify-session";
 import { Badge } from "@/components/ui/badge";
 import { OnlyAdmin } from "@/components/shared/auth/only-admin";
 import { PayPalPayment } from "@/components/shared/paypal/paypal-payment";
+import { StripePayment } from "@/components/shared/stripe/stripe-payment";
 import { MarkAsPaidButton } from "@/components/shared/order/mark-as-paid-button";
 import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,14 +18,13 @@ import { ShippingAddress } from "@/types";
 
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { userId } = await verifySession();
+  const { userId, isAdmin } = await verifySession();
 
   const order = await OrderService.getOrderById(id);
   if (!order) return "Order not found";
 
-  // TODO: add admin view permissions
   // Users can only view their own orders
-  if (order.userId !== userId) return "Not Authorized to see this page";
+  if (!isAdmin && order.userId !== userId) return "Not Authorized to see this page";
 
   return (
     <div className="flex flex-col gap-4 py-4">
@@ -98,6 +98,11 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               orderId={id}
               options={{ clientId: process.env.PAYPAL_CLIENT_ID || "sb" }}
             />
+          )}
+
+          {/* Stripe Payment */}
+          {!order.isPaid && order.paymentMethod === "stripe" && (
+            <StripePayment amount={order.itemsPrice} orderId={order.id} />
           )}
         </OrderPricingDetails>
       </div>

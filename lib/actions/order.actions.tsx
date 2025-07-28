@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { OrderService } from "@/lib/services/order.services";
 import { PaypalService } from "@/lib/payments/paypal.services";
+import { StripeService } from "@/lib/payments/stripe.service";
 
 export async function createOrderAction() {
   try {
@@ -114,6 +115,50 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
   } catch (error) {
     console.error("[Approve PayPal Order Action error]", error);
     return { success: false, message: "Error approving Paypal Order" };
+  }
+}
+
+export async function createStripePaymentIntentAction(amount: number, orderId: string) {
+  try {
+    const order = await OrderService.getOrderById(orderId);
+
+    if (!order) throw new Error("Order not found");
+    if (order.isPaid) throw new Error("This order has already been paid");
+    if (order.paymentMethod !== "stripe") throw new Error("Order payment method is not Stripe");
+
+    if (order.stripePaymentIntentId) {
+      const paymentIntent = await StripeService.getPaymentIntent(order.stripePaymentIntentId);
+
+      if (["succeeded", "canceled"].includes(paymentIntent.status)) {
+        throw new Error("Payment Intent already processed");
+      }
+
+      return {
+        success: true,
+        message: "Stripe Payment Intent Created Successfully",
+        clientSecret: paymentIntent.client_secret,
+      };
+    }
+
+    const paymentIntent = await StripeService.createPaymentIntent(amount, orderId);
+
+    await OrderService.updateOrder(orderId, {
+      stripePaymentIntentId: paymentIntent.id,
+    });
+
+    return {
+      success: true,
+      message: "Stripe Payment Intent Created Successfully",
+      clientSecret: paymentIntent.client_secret,
+    };
+  } catch (error) {
+    console.error("[Create Stripe Payment Intent Action Error]", error);
+
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+
+    return { success: false, message: "Error creating Stripe Payment Intent" };
   }
 }
 
