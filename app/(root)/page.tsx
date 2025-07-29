@@ -5,6 +5,7 @@ import { FeaturedProducts } from "@/components/shared/product/featured-products"
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { FeaturesApp } from "@/components/shared/home/features-app";
 
 export default async function HomePage() {
   return (
@@ -32,6 +33,7 @@ export default async function HomePage() {
         <Button asChild>
           <Link href="/search">See All Products</Link>
         </Button>
+        <FeaturesApp />
       </div>
     </div>
   );
