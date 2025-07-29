@@ -22,7 +22,12 @@ function convertPrismaOrderItemToPOJO(orderItem: Omit<PrismaOrderItem, "orderId"
   };
 }
 
-function convertPrismaOrderToPOJO(order: PrismaOrder & { OrderItem?: PrismaOrderItem[] }): Order {
+function convertPrismaOrderToPOJO(
+  order: PrismaOrder & {
+    OrderItem?: PrismaOrderItem[];
+    user?: { name: string | null; email: string };
+  },
+): Order {
   const { OrderItem, ...restOrder } = order;
   return {
     ...toPlainObject(restOrder),
@@ -202,7 +207,7 @@ export const OrderService = {
       return updatedOrderInTransaction;
     });
 
-    return updatedOrder;
+    return convertPrismaOrderToPOJO(updatedOrder);
   },
 
   updateOrderToDelivered: async (id: string) => {

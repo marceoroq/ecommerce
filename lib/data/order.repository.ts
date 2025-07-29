@@ -11,6 +11,7 @@ import { OrderItem } from "@/types";
 
 type OrderWithItems = PrismaModel & {
   OrderItem: PrismaOrderItem[];
+  user: { name: string | null; email: string };
 };
 
 export type PrismaSalesByDate = {
@@ -27,7 +28,7 @@ export const OrderRepository = {
     await prisma?.order.findMany(options),
 
   findById: async <T extends Prisma.OrderFindUniqueArgs>(
-    args: Prisma.SelectSubset<T, Prisma.OrderFindUniqueArgs>
+    args: Prisma.SelectSubset<T, Prisma.OrderFindUniqueArgs>,
   ): Promise<Prisma.OrderGetPayload<T> | null> => {
     return await prisma.order.findUnique(args);
   },
@@ -62,7 +63,7 @@ export const OrderRepository = {
       userId: string;
       items: OrderItem[];
     },
-    cartId: string
+    cartId: string,
   ): Promise<string> => {
     const { userId, items, ...orderData } = data;
 
@@ -112,7 +113,7 @@ export const OrderRepository = {
     await prisma.order.deleteMany(options),
 
   aggregate: async (
-    options: Prisma.OrderAggregateArgs
+    options: Prisma.OrderAggregateArgs,
   ): Promise<Prisma.GetOrderAggregateType<Prisma.OrderAggregateArgs>> =>
     await prisma.order.aggregate(options),
 

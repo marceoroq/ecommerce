@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { NextRequest, NextResponse } from "next/server";
 
 import { OrderService } from "@/lib/services/order.services";
+import { EmailService } from "@/lib/services/email.services";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
   if (!orderId) {
     console.error(
       "⚠️  Webhook received a payment_intent.succeeded event",
-      "but did not find an orderId."
+      "but did not find an orderId.",
     );
     return NextResponse.json(null, { status: 400 });
   }
@@ -40,7 +41,8 @@ export async function POST(request: NextRequest) {
   switch (event.type) {
     case "payment_intent.succeeded":
       // TODO: check before if order is already paid
-      await OrderService.updateOrderToPaid(orderId);
+      const updatedOrder = await OrderService.updateOrderToPaid(orderId);
+      await EmailService.sendOrderReceipt(updatedOrder);
       break;
     case "payment_intent.canceled":
       // TODO: to be defined

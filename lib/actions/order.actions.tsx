@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { EmailService } from "@/lib/services/email.services";
 import { OrderService } from "@/lib/services/order.services";
 import { PaypalService } from "@/lib/payments/paypal.services";
 import { StripeService } from "@/lib/payments/stripe.service";
@@ -99,7 +100,7 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
       throw new Error("Error in PayPal payment");
     }
 
-    await OrderService.updateOrderToPaid(orderId, {
+    const updatedOrder = await OrderService.updateOrderToPaid(orderId, {
       id: captureData.id,
       status: captureData.status,
       pricePaid: captureData.purchase_units[0].payments.captures[0].amount.value,
@@ -108,6 +109,8 @@ export async function approvePayPalOrder(orderId: string, paypalOrderId: string)
         payerId: captureData.payer.payer_id,
       },
     });
+
+    await EmailService.sendOrderReceipt(updatedOrder);
 
     revalidatePath(`/order/${orderId}`);
 
@@ -174,7 +177,9 @@ export async function markOrderAsPaid(orderId: string) {
     const order = await OrderService.getOrderById(orderId);
     if (!order) throw new Error("Order not found");
 
-    await OrderService.updateOrderToPaid(orderId);
+    const updatedOrder = await OrderService.updateOrderToPaid(orderId);
+
+    await EmailService.sendOrderReceipt(updatedOrder);
 
     revalidatePath(`/order/${orderId}`);
 

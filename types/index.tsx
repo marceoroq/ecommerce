@@ -50,7 +50,7 @@ export type Order = z.infer<typeof insertOrderSchema> & {
   stripePaymentIntentId?: string | null;
   createdAt: Date;
   updatedAt: Date;
-  // user: {name: string, email: string}
+  user?: { name: string | null; email: string };
 };
 
 export type PaypalResult = z.infer<typeof paymentResultSchema> & {
