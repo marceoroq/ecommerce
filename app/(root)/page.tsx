@@ -1,11 +1,12 @@
+import Link from "next/link";
 import { Suspense } from "react";
 
-import { ProductList } from "@/components/shared/product/product-list";
-import { FeaturedProducts } from "@/components/shared/product/featured-products";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FeaturesApp } from "@/components/shared/home/features-app";
+import { ProductList } from "@/components/shared/product/product-list";
+import { DealCountdown } from "@/components/shared/home/deal-countdown";
+import { FeaturedProducts } from "@/components/shared/product/featured-products";
 
 export default async function HomePage() {
   return (
@@ -33,6 +34,7 @@ export default async function HomePage() {
         <Button asChild>
           <Link href="/search">See All Products</Link>
         </Button>
+        <DealCountdown />
         <FeaturesApp />
       </div>
     </div>
