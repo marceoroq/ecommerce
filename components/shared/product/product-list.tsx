@@ -5,9 +5,9 @@ import { ProductCard } from "@/components/shared/product/product-card";
 import { Product } from "@/types";
 
 export const ProductList = async () => {
-  const productsList = await ProductService.getProducts();
+  const productsList = await ProductService.getProducts({ sortBy: "newest" });
 
-  const limit = 10;
+  const limit = 4;
   const hasProducts = productsList.length > 0;
   const limitedData = limit ? productsList.slice(0, limit) : productsList;
 

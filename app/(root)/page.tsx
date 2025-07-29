@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { ProductList } from "@/components/shared/product/product-list";
 import { FeaturedProducts } from "@/components/shared/product/featured-products";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function HomePage() {
   return (
@@ -13,7 +15,7 @@ export default async function HomePage() {
         <FeaturedProducts />
       </Suspense>
 
-      <div className="w-full my-10">
+      <div className="flex flex-col w-full justify-center items-center gap-4 my-10">
         <h2 className="h2-bold mb-4">Newest Arribals</h2>
         <Suspense
           fallback={
@@ -27,6 +29,9 @@ export default async function HomePage() {
         >
           <ProductList />
         </Suspense>
+        <Button asChild>
+          <Link href="/search">See All Products</Link>
+        </Button>
       </div>
     </div>
   );
