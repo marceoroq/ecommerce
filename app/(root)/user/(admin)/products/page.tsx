@@ -4,6 +4,11 @@ import { SearchInput } from "@/components/shared/search/search-input";
 import { ProductsTable } from "@/components/shared/products/products-table";
 import { CreateProductButton } from "@/components/shared/products/create-product-button";
 
+export const metadata = {
+  title: "Products | Admin Dashboard",
+  description: "Manage your products here",
+};
+
 export default async function ProductsPage({
   searchParams,
 }: {

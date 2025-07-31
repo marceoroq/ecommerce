@@ -6,6 +6,11 @@ import { Chart } from "@/components/shared/user/chart";
 import { LastSalesTable } from "@/components/shared/user/last-sales-table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+export const metadata = {
+  title: "Overview | Admin Dashboard",
+  description: "View sales statistics, revenue, customers and products overview",
+};
+
 export default async function OverviewPage() {
   const data = await OrderService.getOrderAdminSummary();
 

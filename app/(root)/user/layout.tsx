@@ -1,6 +1,17 @@
 import { verifySession } from "@/lib/auth/verify-session";
-
 import { UserSidebarMenu } from "@/components/shared/user/user-sidebar-menu";
+
+export const generateMetadata = async () => {
+  const { isAdmin } = await verifySession();
+
+  return {
+    title: isAdmin ? "Admin Dashboard" : "User Dashboard",
+    description: isAdmin ? "Manage store administration" : "Manage your profile and orders",
+    keywords: isAdmin
+      ? ["admin", "dashboard", "products", "users", "management"]
+      : ["user", "profile", "dashboard", "orders", "account"],
+  };
+};
 
 export default async function UserLayout({ children }: { children: React.ReactNode }) {
   const { isAdmin } = await verifySession();

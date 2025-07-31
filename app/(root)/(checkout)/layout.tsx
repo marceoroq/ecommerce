@@ -5,11 +5,13 @@ import { CartService } from "@/lib/services/cart.services";
 
 import CheckoutSteps from "@/components/shared/checkout/checkout-steps";
 
-export default async function CheckoutLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const metadata = {
+  title: "Checkout",
+  description: "Complete your purchase by providing your shipping and payment information.",
+  keywords: ["checkout", "purchase", "ecommerce"],
+};
+
+export default async function CheckoutLayout({ children }: { children: React.ReactNode }) {
   const sessionCartId = (await cookies()).get("sessionCartId")?.value;
   const cart = await CartService.getCurrentCart(sessionCartId);
 

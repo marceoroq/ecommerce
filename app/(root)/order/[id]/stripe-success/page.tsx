@@ -5,6 +5,12 @@ import { StripeService } from "@/lib/payments/stripe.service";
 
 import { RedirectToOrder } from "@/components/shared/order/redirect-to-order";
 
+export const metadata = {
+  title: "Payment Successful",
+  description: "Your payment has been processed successfully.",
+  keywords: ["payment", "success", "ecommerce"],
+};
+
 export default async function SuccessPage({
   params,
   searchParams,

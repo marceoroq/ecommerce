@@ -5,6 +5,11 @@ import { UserService } from "@/lib/services/user.services";
 import { UsersTable } from "@/components/shared/users/users-table";
 import { SearchInput } from "@/components/shared/search/search-input";
 
+export const metadata = {
+  title: "Users | Admin Dashboard",
+  description: "Manage your users here",
+};
+
 export default async function UsersPage({
   searchParams,
 }: {
