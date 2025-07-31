@@ -4,6 +4,12 @@ import { verifySession } from "@/lib/auth/verify-session";
 import { TablePagination } from "@/components/shared/table-pagination";
 import { OrderHistoryTable } from "@/components/shared/order-history/order-history-table";
 
+export const metadata = {
+  title: "Order History",
+  description: "View your complete order history and track your purchases.",
+  keywords: ["orders", "history", "purchases", "tracking", "ecommerce"]
+};
+
 export default async function OrderHistoryPage({
   searchParams,
 }: {

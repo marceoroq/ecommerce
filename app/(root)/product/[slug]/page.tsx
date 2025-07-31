@@ -1,6 +1,7 @@
 import { FaStar } from "react-icons/fa6";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 import { ImageOff } from "lucide-react";
 
 import { auth } from "@/lib/auth";
@@ -15,6 +16,23 @@ import { ProductImages } from "@/components/shared/product/product-images";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { Review } from "@/types";
+
+export async function generateMetadata(
+  { params }: {params: { slug: string }}
+): Promise<Metadata> {
+  const product = await ProductService.getProductBySlug(params.slug);
+  if (!product) return {};
+
+  return {
+    title: `${product.name} | ${product.brand}`,
+    description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      images: product.images,
+    },
+  };
+}
 
 interface ProductDetailsPageProps {
   params: Promise<{ slug: string }>;

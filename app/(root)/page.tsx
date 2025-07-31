@@ -1,12 +1,20 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { Metadata } from "next";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FeaturesApp } from "@/components/shared/home/features-app";
 import { ProductList } from "@/components/shared/product/product-list";
+
 import { DealCountdown } from "@/components/shared/home/deal-countdown";
 import { FeaturedProducts } from "@/components/shared/product/featured-products";
+
+export const metadata: Metadata = {
+  title: "Home",
+  description: "Discover amazing products at our ecommerce store",
+  keywords: ["ecommerce", "online shopping", "deals", "discounts"],
+};
 
 export default async function HomePage() {
   return (

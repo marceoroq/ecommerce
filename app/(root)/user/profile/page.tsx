@@ -4,6 +4,12 @@ import { ProfileForm } from "@/components/shared/user/profile-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SessionProvider } from "next-auth/react";
 
+export const metadata = {
+  title: "User Profile",
+  description: "Manage your personal information and account settings.",
+  keywords: ["profile", "account", "settings", "user", "ecommerce"]
+};
+
 export default async function ProfilePage() {
   const { user, session } = await verifySession();
 

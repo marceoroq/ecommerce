@@ -15,6 +15,31 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   metadataBase: new URL(SERVER_URL),
+  openGraph: {
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    url: SERVER_URL,
+    siteName: APP_NAME,
+    images: [
+      {
+        url: `${SERVER_URL}/images/logo.svg`,
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    images: [`${SERVER_URL}/images/logo.svg`],
+  },
+  alternates: {
+    canonical: SERVER_URL,
+  },
+  keywords: ['ecommerce', 'online shopping', 'nextjs', 'react'],
 };
 
 export default function RootLayout({

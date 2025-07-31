@@ -8,6 +8,7 @@ import { OnlyAdmin } from "@/components/shared/auth/only-admin";
 import { PayPalPayment } from "@/components/shared/paypal/paypal-payment";
 import { StripePayment } from "@/components/shared/stripe/stripe-payment";
 import { MarkAsPaidButton } from "@/components/shared/order/mark-as-paid-button";
+
 import { OrderItemsDetails } from "@/components/shared/order/order-items-details";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrderPricingDetails } from "@/components/shared/order/order-pricing-details";
@@ -15,6 +16,39 @@ import { MarkAsDeliveredButton } from "@/components/shared/order/mark-as-deliver
 import { ShippingAddressDetails } from "@/components/shared/order/shipping-address-details";
 
 import { ShippingAddress } from "@/types";
+import { APP_NAME, SERVER_URL } from "@/lib/constants";
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const order = await OrderService.getOrderById(params.id);
+  const status = order?.isPaid ? "Paid" : "Pending";
+  return {
+    title: `Order #${order?.id} - ${status}`,
+    description: `View details and status for your order #${order?.id}. ${order?.isPaid ? "Payment confirmed" : "Pending payment"}. Track shipping and delivery information.`,
+    keywords: [
+      "order",
+      "details",
+      "purchase",
+      "tracking",
+      "ecommerce",
+      "shipping",
+      "delivery",
+      "invoice",
+    ],
+    openGraph: {
+      title: `Order #${order?.id} - ${status} | ${APP_NAME}`,
+      description: `View details for your order #${order?.id} at ${APP_NAME}`,
+      url: `https://${SERVER_URL}/order/${params.id}`,
+      siteName: APP_NAME,
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Order #${order?.id} - ${status} | ${APP_NAME}`,
+      description: `View details for your order #${order?.id} at ${APP_NAME}`,
+    },
+  };
+}
 
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

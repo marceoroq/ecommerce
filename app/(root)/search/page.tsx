@@ -4,6 +4,12 @@ import { ProductCard } from "@/components/shared/product/product-card";
 import { SortSelector } from "@/components/shared/search/sort-selector";
 import { ActiveFilters } from "@/components/shared/search/active-filters";
 
+export const metadata = {
+  title: "Search Products",
+  description: "Find the perfect products with our advanced search and filtering options.",
+  keywords: ["search", "products", "ecommerce", "filter", "shopping"]
+};
+
 type SortOptions = "newest" | "lowest" | "highest" | "rating";
 
 export default async function SearchPage({
