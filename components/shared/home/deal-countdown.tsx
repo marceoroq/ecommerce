@@ -6,17 +6,23 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 // Static target date (replace with desired date)
-const TARGET_DATE = new Date("2025-08-20T00:00:00");
+const TARGET_DATE = new Date("2025-12-25T00:00:00");
 
 // Function to calculate the time remaining
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
+} from "date-fns";
+
 const calculateTimeRemaining = (targetDate: Date) => {
-  const currentTime = new Date();
-  const timeDifference = Math.max(Number(targetDate) - Number(currentTime), 0);
+  const now = new Date();
   return {
-    days: Math.floor(timeDifference / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-    minutes: Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60)),
-    seconds: Math.floor((timeDifference % (1000 * 60)) / 1000),
+    days: differenceInDays(targetDate, now),
+    hours: differenceInHours(targetDate, now) % 24,
+    minutes: differenceInMinutes(targetDate, now) % 60,
+    seconds: differenceInSeconds(targetDate, now) % 60,
   };
 };
 
