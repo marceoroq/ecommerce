@@ -18,8 +18,9 @@ import { ShippingAddressDetails } from "@/components/shared/order/shipping-addre
 import { ShippingAddress } from "@/types";
 import { APP_NAME, SERVER_URL } from "@/lib/constants";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const order = await OrderService.getOrderById(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const order = await OrderService.getOrderById(id);
   const status = order?.isPaid ? "Paid" : "Pending";
   return {
     title: `Order #${order?.id} - ${status}`,
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     openGraph: {
       title: `Order #${order?.id} - ${status} | ${APP_NAME}`,
       description: `View details for your order #${order?.id} at ${APP_NAME}`,
-      url: `https://${SERVER_URL}/order/${params.id}`,
+      url: `https://${SERVER_URL}/order/${id}`,
       siteName: APP_NAME,
       locale: "en_US",
       type: "website",
