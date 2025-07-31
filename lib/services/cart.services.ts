@@ -64,4 +64,6 @@ export const CartService = {
 
   updateCart: async (id: string, data: Prisma.CartUpdateInput): Promise<PrismaModel> =>
     await CartRepository.update(id, data),
+
+  deleteCart: async (id: string): Promise<PrismaModel> => await CartRepository.delete(id),
 };
