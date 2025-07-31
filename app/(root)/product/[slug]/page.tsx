@@ -17,10 +17,13 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { Review } from "@/types";
 
-export async function generateMetadata(
-  { params }: {params: { slug: string }}
-): Promise<Metadata> {
-  const product = await ProductService.getProductBySlug(params.slug);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await ProductService.getProductBySlug(slug);
   if (!product) return {};
 
   return {
