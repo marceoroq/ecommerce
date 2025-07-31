@@ -16,12 +16,13 @@ import {
   updateUserAsAdminSchema,
   updateUserProfileSchema,
 } from "@/lib/validators";
+import { cookies } from "next/headers";
 
 export async function signInWithCredentials(
   prevState: unknown, // Required by useActionState in Form Component
   // In Next.js 15 and React 19, Server Actions receive FormData by default.
   // It's best to use FormData and then parse it with Zod.
-  formData: FormData
+  formData: FormData,
 ) {
   // Extract data from FormData
   const email = formData.get("email");
@@ -138,6 +139,9 @@ export async function signUpWithCredentials(prevState: unknown, formData: FormDa
 }
 
 export async function signOutAction() {
+  // Delete the session cart ID cookie before signing out to ensure the cart is reset.
+  (await cookies()).delete("sessionCartId");
+
   await signOut({
     // Redirect to homepage after sign out to avoid landing back on a protected route.
     // If we log out from a protected page and don't redirect, the login page will appear
