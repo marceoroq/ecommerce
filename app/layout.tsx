@@ -27,11 +27,11 @@ export const metadata: Metadata = {
         height: 600,
       },
     ],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: APP_NAME,
     description: APP_DESCRIPTION,
     images: [`${SERVER_URL}/images/logo.svg`],
@@ -39,7 +39,17 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SERVER_URL,
   },
-  keywords: ['ecommerce', 'online shopping', 'nextjs', 'react'],
+  keywords: ["ecommerce", "online shopping", "nextjs", "react"],
+  icons: [
+    {
+      media: "(prefers-color-scheme: dark)",
+      url: "/images/favicon-dark.ico",
+    },
+    {
+      media: "(prefers-color-scheme: light)",
+      url: "/images/favicon-light.ico",
+    },
+  ],
 };
 
 export default function RootLayout({
