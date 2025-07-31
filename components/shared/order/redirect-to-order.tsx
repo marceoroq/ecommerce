@@ -26,7 +26,7 @@ export const RedirectToOrder = ({
       clearInterval(interval);
       clearTimeout(timer);
     };
-  }, []);
+  }, [orderId]);
 
   return (
     <p className={cn(className)}>
