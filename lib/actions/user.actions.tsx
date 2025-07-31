@@ -5,6 +5,7 @@ import { hashSync } from "bcryptjs";
 import { AuthError } from "next-auth";
 
 import { UserService } from "@/lib/services/user.services";
+import { CartService } from "@/lib/services/cart.services";
 import { signIn, signOut } from "@/lib/auth";
 
 import { AdminUpdateUser, PaymentMethod, ShippingAddress, UserProfile } from "@/types";
@@ -27,6 +28,7 @@ export async function signInWithCredentials(
   // Extract data from FormData
   const email = formData.get("email");
   const password = formData.get("password");
+  const sessionCartId = formData.get("sessionCartId")?.toString();
 
   try {
     const validatedFields = signInFormSchema.safeParse({
@@ -51,6 +53,10 @@ export async function signInWithCredentials(
       // We'll handle redirection manually after a successful signIn.
       // This allows us to display success/error messages before redirecting.
     });
+
+    // We check if the user exists and if it does, we associate the guest cart to the user
+    const user = await UserService.getUserByEmail(userEmail);
+    if (user) await CartService.associateGuestCart(sessionCartId!, user.id);
 
     return { success: true, message: "Successfully logged in" };
   } catch (error) {

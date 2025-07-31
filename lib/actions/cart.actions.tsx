@@ -59,7 +59,9 @@ export async function manageCartItemAdditionAction(itemData: CartItem) {
       if (productInCart) {
         // The product is in the cart, we'll update its quantity.
         const updatedItems = cart.items.map((item) =>
-          item.productId === validatedItem.productId ? { ...item, quantity: newItemQuantity } : item
+          item.productId === validatedItem.productId
+            ? { ...item, quantity: newItemQuantity }
+            : item,
         );
 
         await CartService.updateCart(cart.id, {
@@ -140,7 +142,7 @@ export async function decreaseCartItemQuantityAction(productId: string, quantity
       const updatedItems = cart.items.map((item) =>
         item.productId === productId
           ? { ...item, quantity: item.quantity - quantityToRemove }
-          : item
+          : item,
       );
 
       await CartService.updateCart(cart.id, {
@@ -174,6 +176,29 @@ export async function removeProductFromCartAction(productId: string) {
     return { success: true, message: "Item removed from cart." };
   } catch (error) {
     console.error("[removeProductFromCartAction Error]:", error);
+
+    return { success: false, message: String(error) };
+  }
+}
+
+export async function keepNewCartAction() {
+  try {
+    const cart = await getCurrentCart();
+    if (!cart) return { success: false, message: "Cart not found" };
+    if (!cart.userId) return { success: false, message: "Cart not associated with a user" };
+
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+    if (!sessionCartId) return { success: false, message: "Error getting sessionCartId" };
+
+    await CartService.keepNewCart({
+      userId: cart.userId,
+      previousCartId: cart.id,
+      sessionCartId,
+    });
+
+    return { success: true, message: "Cart kept." };
+  } catch (error) {
+    console.error("[Keep Current Cart Action Error]:", error);
 
     return { success: false, message: String(error) };
   }

@@ -17,8 +17,9 @@ import Logo from "@/components/shared/logo";
 
 export function LoginForm({
   className,
+  sessionCartId,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { sessionCartId: string }) {
   const [state, formAction, isPending] = useActionState(signInWithCredentials, {
     success: false,
     message: "",
@@ -45,6 +46,7 @@ export function LoginForm({
             />
           </div>
           <form className="p-6 md:p-8" action={formAction}>
+            <input type="hidden" name="sessionCartId" value={sessionCartId?.toString()} />
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <Link href="/">
@@ -70,10 +72,7 @@ export function LoginForm({
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
+                  <a href="#" className="ml-auto text-sm underline-offset-2 hover:underline">
                     Forgot your password?
                   </a>
                 </div>
@@ -120,8 +119,8 @@ export function LoginForm({
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Terms of Service</a> and{" "}
+        <a href="#">Privacy Policy</a>.
       </div>
     </div>
   );
